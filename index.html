@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ DOG COURT — Your Dog Pleads Their Case</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Landing / Upload Screen -->
+        <section id="screen-upload" class="screen active">
+            <div class="hero">
+                <div class="gavel-icon">🏛️</div>
+                <h1>DOG COURT</h1>
+                <p class="tagline">Every dog deserves their day in court.</p>
+                <p class="subtitle">Upload a photo of your dog's crime. AI will generate a full courtroom trial — complete with judge, defense attorney, prosecution, and voice-acted drama.</p>
+            </div>
+
+            <div class="upload-zone" id="upload-zone">
+                <div class="upload-content">
+                    <div class="upload-icon">📸</div>
+                    <p class="upload-text">Drop your evidence here</p>
+                    <p class="upload-hint">Photo of the crime scene (chewed shoes, destroyed pillows, stolen food...)</p>
+                    <button class="btn-upload" id="btn-browse">Choose File</button>
+                </div>
+                <input type="file" id="file-input" accept="image/*" hidden>
+            </div>
+
+            <div class="preview-area hidden" id="preview-area">
+                <img id="preview-img" alt="Crime scene evidence">
+                <div class="preview-label">📋 Exhibit A</div>
+                <button class="btn-primary" id="btn-file-charges">⚖️ File Charges</button>
+            </div>
+
+            <div class="api-keys-section">
+                <details>
+                    <summary>🔑 API Keys (required for first use)</summary>
+                    <div class="api-form">
+                        <div class="field">
+                            <label for="gemini-key">Google AI (Gemini) API Key</label>
+                            <input type="password" id="gemini-key" placeholder="AIza...">
+                            <a href="https://aistudio.google.com/apikey" target="_blank" class="key-link">Get free key →</a>
+                        </div>
+                        <div class="field">
+                            <label for="elevenlabs-key">ElevenLabs API Key</label>
+                            <input type="password" id="elevenlabs-key" placeholder="sk_...">
+                            <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" class="key-link">Get free key →</a>
+                        </div>
+                        <button class="btn-secondary" id="btn-save-keys">Save Keys</button>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <!-- Processing Screen -->
+        <section id="screen-processing" class="screen">
+            <div class="processing-container">
+                <div class="spinner"></div>
+                <h2 id="processing-status">Analyzing the crime scene...</h2>
+                <div class="progress-steps">
+                    <div class="step" id="step-analyze">
+                        <span class="step-icon">🔍</span>
+                        <span class="step-text">Analyzing evidence</span>
+                    </div>
+                    <div class="step" id="step-script">
+                        <span class="step-icon">📝</span>
+                        <span class="step-text">Writing courtroom script</span>
+                    </div>
+                    <div class="step" id="step-voices">
+                        <span class="step-icon">🎙️</span>
+                        <span class="step-text">Voice-acting the trial</span>
+                    </div>
+                    <div class="step" id="step-sfx">
+                        <span class="step-icon">🔊</span>
+                        <span class="step-text">Adding courtroom atmosphere</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trial Screen -->
+        <section id="screen-trial" class="screen">
+            <div class="courtroom">
+                <div class="case-header">
+                    <span class="case-number" id="case-number">Case #472</span>
+                    <h2 id="case-title">The People vs. Muffin</h2>
+                    <p class="charge" id="case-charge">Charge: Destruction of Property in the First Degree</p>
+                </div>
+
+                <div class="evidence-panel">
+                    <img id="evidence-img" alt="Crime scene">
+                    <div class="evidence-tag">EXHIBIT A</div>
+                </div>
+
+                <div class="audio-player">
+                    <button class="btn-play" id="btn-play">▶</button>
+                    <div class="waveform" id="waveform">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <span class="time" id="time-display">0:00 / 0:00</span>
+                </div>
+
+                <div class="transcript" id="transcript">
+                    <!-- Transcript lines will be inserted here -->
+                </div>
+
+                <div class="verdict-panel hidden" id="verdict-panel">
+                    <div class="verdict-stamp" id="verdict-stamp">NOT GUILTY</div>
+                    <p class="verdict-reason" id="verdict-reason">by reason of extreme cuteness</p>
+                </div>
+
+                <div class="trial-actions">
+                    <button class="btn-secondary" id="btn-new-trial">📸 New Trial</button>
+                    <button class="btn-primary" id="btn-share">🔗 Share Verdict</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Built for <a href="https://dev.to/challenges/weekend-2026-08-13">DEV Weekend Challenge: Dog Days Edition</a> by <a href="https://dev.to/simplynadaf">Sarvar Nadaf</a></p>
+        <p class="tech-badges">
+            <span class="badge google">Google AI</span>
+            <span class="badge elevenlabs">ElevenLabs</span>
+        </p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
