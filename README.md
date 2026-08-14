@@ -21,7 +21,7 @@ I built an AI that catches it in a photo.
 
 <br/>
 
-[Live Site →](https://simplynadaf.github.io/dog-court) &nbsp;•&nbsp; [Watch Demo →](https://www.youtube.com/watch?v=vqyF_65Qc_s) &nbsp;•&nbsp; [Read Article →](https://dev.to/sarvar_04/59-of-dogs-are-obese-and-their-owners-dont-know-so-i-built-an-ai-that-tells-them-2a89)
+[Live Site →](https://simplynadaf.github.io/dog-court) &nbsp;|&nbsp; [Watch Demo →](https://www.youtube.com/watch?v=vqyF_65Qc_s) &nbsp;|&nbsp; [Read Article →](https://dev.to/sarvar_04/59-of-dogs-are-obese-and-their-owners-dont-know-so-i-built-an-ai-that-tells-them-2a89)
 
 </div>
 
@@ -39,7 +39,7 @@ I built an AI that catches it in a photo.
 
 ---
 
-## 🎯 What It Does
+## 🎯 4 Modes, 1 Goal: Keep Your Dog Healthy
 
 | Mode | What Happens |
 |------|-------------|
@@ -50,7 +50,20 @@ I built an AI that catches it in a photo.
 
 ---
 
-## 📊 The Problem
+## ✨ Key Features
+
+- 🖼️ **Multimodal AI** - Upload any dog photo, AI understands what it sees
+- 🎯 **Structured Reports** - Body condition score, observations, action items (not generic AI rambling)
+- 🔊 **Voice Summaries** - Calm spoken summary when you need reassurance at 2am
+- 🎭 **Multi-Voice Court Drama** - 4 unique characters: Judge, Defense, Prosecution, Defendant
+- 🚦 **Color-Coded Urgency** - Green/Yellow/Orange/Red so you know instantly how serious it is
+- 🐕 **Breed-Aware** - Enter your dog's breed for context-specific health risks
+- 🔒 **100% Client-Side** - No backend, no data collection, keys stay in your browser
+- ⚡ **Zero Dependencies** - 3 files. No npm. No build step. Instant load.
+
+---
+
+## 📊 The Problem (Real Data)
 
 | Crisis | Scale |
 |--------|-------|
@@ -65,19 +78,12 @@ I built an AI that catches it in a photo.
 
 ## 🛠️ Tech Stack
 
-```
-┌────────────────────────────────────────────────┐
-│  Frontend     │  Vanilla HTML/CSS/JS           │
-│  AI Engine    │  Google Gemini 3.5 Flash       │
-│  Voice        │  ElevenLabs TTS + Dialogue     │
-│  Hosting      │  GitHub Pages                  │
-│  Dependencies │  Zero. None. Nada.             │
-└────────────────────────────────────────────────┘
-```
-
-- **Google AI (Gemini 3.5 Flash)** - Multimodal image analysis, structured JSON output, breed-aware health assessment
-- **ElevenLabs** - Voice summaries (TTS) + multi-character courtroom drama (Text-to-Dialogue API)
-- **Zero dependencies** - No React, no build tools, no node_modules. Pure vanilla. Instant load.
+| Layer | Technology | Why |
+|-------|-----------|-----|
+| Frontend | Vanilla HTML/CSS/JS | Zero dependencies, instant load, deploys anywhere |
+| AI Engine | Google Gemini 3.5 Flash | Multimodal vision, structured JSON output, free tier |
+| Voice | ElevenLabs TTS + Dialogue | Natural voice summaries + multi-character drama |
+| Hosting | GitHub Pages | Free, auto-deploy on push |
 
 ---
 
@@ -87,47 +93,52 @@ I built an AI that catches it in a photo.
 git clone https://github.com/SimplyNadaf/dog-court.git
 cd dog-court
 npx serve .
-# Open http://localhost:3000
 ```
 
-### API Keys (Free)
+Open `http://localhost:3000` → Click 🔑 Keys → Enter your API keys → Upload a dog photo.
+
+### API Keys (Free, 30 seconds)
 
 | Service | Get Key | Required |
 |---------|---------|----------|
 | Google AI (Gemini) | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) | ✅ Yes |
 | ElevenLabs | [elevenlabs.io/app/settings/api-keys](https://elevenlabs.io/app/settings/api-keys) | Optional (for voice) |
 
-> 🔒 Keys are stored in your browser's localStorage. Never sent to any server. Never logged.
+---
+
+## 🔬 Architecture
+
+```
+┌─────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  Dog Photo  │────▶│  Google Gemini   │────▶│  Structured     │
+│  + Context  │     │  3.5 Flash       │     │  JSON Report    │
+└─────────────┘     └──────────────────┘     └────────┬────────┘
+                                                      │
+                                                      ▼
+                                             ┌─────────────────┐
+                                             │  ElevenLabs     │
+                                             │  TTS/Dialogue   │
+                                             └────────┬────────┘
+                                                      │
+                                                      ▼
+                                             ┌─────────────────┐
+                                             │  Voice Summary  │
+                                             │  or Court Drama │
+                                             └─────────────────┘
+```
+
+**Dog Court extends the pipeline:**
+
+Photo → Gemini (analyze crime) → Gemini (write script) → ElevenLabs Dialogue (4 voices) → Audio drama
 
 ---
 
-## 🔬 How It Works
+## 🔒 Privacy
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                                                          │
-│  📸 User uploads photo + selects mode                    │
-│                                                          │
-│  ┌─────────────────────────────────────────────────┐     │
-│  │  Health Mode                                    │     │
-│  │  Photo → Gemini Vision → Body condition,        │     │
-│  │  coat, posture, breed risks → Voice summary     │     │
-│  └─────────────────────────────────────────────────┘     │
-│                                                          │
-│  ┌─────────────────────────────────────────────────┐     │
-│  │  Emergency Mode                                 │     │
-│  │  Description + Photo → Gemini Triage →          │     │
-│  │  🟢🟡🟠🔴 Urgency + First aid + When to go     │     │
-│  └─────────────────────────────────────────────────┘     │
-│                                                          │
-│  ┌─────────────────────────────────────────────────┐     │
-│  │  Dog Court Mode                                 │     │
-│  │  Crime photo → Gemini script → ElevenLabs       │     │
-│  │  Text-to-Dialogue → Multi-voice trial audio     │     │
-│  └─────────────────────────────────────────────────┘     │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
+- No backend server. Everything runs in your browser.
+- API keys stored in localStorage only. Never transmitted to us.
+- Dog photos sent directly to Google/ElevenLabs APIs. We never see them.
+- No analytics. No tracking. No cookies.
 
 ---
 
@@ -135,9 +146,10 @@ npx serve .
 
 **[DEV Weekend Challenge: Dog Days Edition](https://dev.to/challenges/weekend-2026-08-13)**
 
-Prize categories targeted:
-- ✅ **Best Use of Google AI** - Gemini multimodal vision + structured JSON health triage
-- ✅ **Best Use of ElevenLabs** - Voice summaries + multi-character courtroom drama
+| Category | How |
+|----------|-----|
+| **Best Use of Google AI** | Gemini multimodal vision + structured JSON for health triage across 4 modes |
+| **Best Use of ElevenLabs** | TTS for voice summaries + Text-to-Dialogue for multi-character court drama |
 
 ---
 
@@ -145,26 +157,36 @@ Prize categories targeted:
 
 ```
 dog-court/
-├── index.html          # Single-page app
-├── style.css           # Premium UI (warm cream, glass, spring animations)
-├── app.js              # All logic (Gemini + ElevenLabs integration)
+├── index.html            # Single-page app (13KB)
+├── style.css             # Premium UI - warm cream, glass nav, spring animations (24KB)
+├── app.js                # Gemini + ElevenLabs integration (29KB)
 ├── img/
-│   ├── banner.png      # Project banner
-│   ├── hero.png        # Hero section image
-│   ├── icon-health.png
-│   ├── icon-behavior.png
-│   ├── icon-emergency.png
-│   └── icon-court.png
-└── .github/
-    └── workflows/
-        └── deploy.yml  # Auto-deploy to GitHub Pages
+│   ├── banner.png        # README banner
+│   ├── hero.png          # Hero section
+│   └── icon-*.png        # Mode icons (health, behavior, emergency, court)
+└── .github/workflows/
+    └── deploy.yml        # Auto-deploy to GitHub Pages on push
 ```
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Some ideas:
+
+- [ ] Add more dog breeds to the health risk database
+- [ ] Support cat health checks
+- [ ] Add multiple language support
+- [ ] Offline mode with cached results
+- [ ] Dark mode
+
+Fork it, improve it, PR it.
 
 ---
 
 ## ⚠️ Disclaimer
 
-PawWise is an AI tool, not a veterinarian. It's designed to help you make better decisions about your dog's health - not replace professional veterinary care. When in doubt, always see your vet.
+PawWise is an AI tool, not a veterinarian. It helps you make better decisions about your dog's health - it does not replace professional veterinary care. When in doubt, always see your vet.
 
 ---
 
@@ -186,7 +208,7 @@ PawWise is an AI tool, not a veterinarian. It's designed to help you make better
 
 ## 📄 License
 
-MIT - Because good tools should be accessible to everyone.
+MIT
 
 ---
 
@@ -194,9 +216,7 @@ MIT - Because good tools should be accessible to everyone.
 
 **Because no dog should suffer in silence while their owner thinks everything is fine.**
 
-<br/>
-
-⭐ If this helped you, give it a star!
+⭐ Star this repo if it helped you!
 
 [![Star this repo](https://img.shields.io/github/stars/simplynadaf/dog-court?style=social)](https://github.com/simplynadaf/dog-court)
 
