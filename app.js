@@ -2,9 +2,7 @@
 // PawWise — AI Vet Friend
 // ============================================================
 
-// DEV MODE: Set to true to use local Bedrock proxy instead of Gemini
-const DEV_MODE = false;
-const PROXY_URL = 'http://localhost:5555';
+// Configuration
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent';
 
 // Pre-baked demos (work without any API keys)
@@ -224,12 +222,8 @@ async function analyze() {
     STATE.geminiKey = document.getElementById('gemini-key').value.trim() || STATE.geminiKey;
     
     // If no API key, use pre-baked demo
-    const useDemo = !STATE.geminiKey && !DEV_MODE;
+    const useDemo = !STATE.geminiKey;
     const hasInput = STATE.imageBase64 || document.getElementById('situation-input').value.trim();
-
-    if (!useDemo && !DEV_MODE && !STATE.geminiKey) {
-        // No key, no demo available for behavior mode — show demo anyway
-    }
 
     if (!hasInput && !useDemo) {
         alert('Please upload a photo or describe the situation.');
@@ -489,13 +483,8 @@ async function callGemini(prompt, includeImage) {
         generationConfig: { temperature: 0.8, responseMimeType: 'application/json' }
     };
 
-    // Route to proxy in dev mode, Gemini in production
-    let url;
-    if (DEV_MODE) {
-        url = PROXY_URL;
-    } else {
-        url = `${GEMINI_URL}?key=${STATE.geminiKey}`;
-    }
+    // Call Gemini API
+    const url = `${GEMINI_URL}?key=${STATE.geminiKey}`;
 
     const res = await fetch(url, {
         method: 'POST',

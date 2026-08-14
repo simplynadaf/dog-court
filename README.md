@@ -32,7 +32,7 @@ Your dog is healthy? Put them on trial for their crimes! Upload evidence of dest
 
 ## 🛠️ Tech Stack
 
-- **Google AI (Gemini 2.0 Flash)** — Multimodal image analysis, structured JSON output, breed-aware health assessment
+- **Google AI (Gemini 3.5 Flash)** — Multimodal image analysis, structured JSON output, breed-aware health assessment
 - **ElevenLabs** — Voice summaries (Text-to-Speech) + multi-character courtroom drama (Text-to-Dialogue API)
 - **Vanilla HTML/CSS/JS** — Zero dependencies, instant load, works everywhere
 
