@@ -667,11 +667,36 @@ body {
     font-weight: 700;
     font-size: 1.05rem;
     margin-bottom: 0.3rem;
+    transition: opacity 0.4s ease;
 }
 
 .loading-sub {
     font-size: 0.85rem;
     color: var(--text-muted);
+    transition: opacity 0.4s ease;
+}
+
+.loading-progress {
+    width: 200px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 3px;
+    margin: 1.5rem auto 0;
+    overflow: hidden;
+}
+
+.loading-progress-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    animation: progress-pulse 2.5s ease-in-out infinite;
+    width: 40%;
+}
+
+@keyframes progress-pulse {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(150%); }
+    100% { transform: translateX(-100%); }
 }
 
 /* === RESULTS === */

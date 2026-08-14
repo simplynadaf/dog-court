@@ -3,7 +3,7 @@
 // ============================================================
 
 // DEV MODE: Set to true to use local Bedrock proxy instead of Gemini
-const DEV_MODE = true;
+const DEV_MODE = false;
 const PROXY_URL = 'http://localhost:5555';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function loadKeys() {
     STATE.geminiKey = localStorage.getItem('pawwise_gemini') || '';
-    STATE.elevenLabsKey = localStorage.getItem('pawwise_eleven') || 'sk_b0d6f61247491565e30be41ba7f460099b6cacf7a9f686a1';
+    STATE.elevenLabsKey = localStorage.getItem('pawwise_eleven') || '';
     if (STATE.geminiKey) document.getElementById('gemini-key').value = STATE.geminiKey;
     if (STATE.elevenLabsKey) document.getElementById('elevenlabs-key').value = STATE.elevenLabsKey;
 }
@@ -165,7 +165,6 @@ function handleFile(file) {
         document.getElementById('preview-img').src = e.target.result;
         document.getElementById('preview').classList.remove('hidden');
         document.getElementById('upload-zone').classList.add('hidden');
-        document.getElementById('btn-analyze').classList.remove('hidden');
     };
     reader.readAsDataURL(file);
 }
@@ -175,7 +174,6 @@ function removeImage() {
     STATE.imageBase64 = null;
     document.getElementById('preview').classList.add('hidden');
     document.getElementById('upload-zone').classList.remove('hidden');
-    document.getElementById('btn-analyze').classList.add('hidden');
     document.getElementById('file-input').value = '';
 }
 
@@ -185,7 +183,6 @@ function removeImage() {
 
 function setupButtons() {
     document.getElementById('btn-analyze').addEventListener('click', analyze);
-    document.getElementById('btn-demo').addEventListener('click', runDemoMode);
     document.getElementById('btn-new').addEventListener('click', resetToStart);
     document.getElementById('btn-share').addEventListener('click', share);
     document.getElementById('btn-keys').addEventListener('click', () => toggleModal(true));
@@ -263,10 +260,32 @@ async function analyze() {
 }
 
 async function runDemoMode() {
-    setLoading('Loading demo results...', 'Pre-generated with AI');
-    await new Promise(r => setTimeout(r, 1500)); // Simulate loading
+    // Realistic AI processing simulation (20-25 seconds)
+    const loadingSteps = [
+        ['Uploading image to AI...', 'Preparing for analysis'],
+        ['AI is examining the photo...', 'Looking at body condition, posture, coat...'],
+        ['Analyzing breed-specific indicators...', 'Cross-referencing with health database'],
+        ['Generating detailed report...', 'Almost done'],
+    ];
 
-    const mode = STATE.mode === 'behavior' ? 'health' : STATE.mode; // behavior uses health demo
+    if (STATE.mode === 'court') {
+        loadingSteps[0] = ['Examining the crime scene...', 'Collecting evidence'];
+        loadingSteps[1] = ['AI is building the case...', 'Interviewing witnesses'];
+        loadingSteps[2] = ['Assembling the courtroom...', 'Briefing the defense attorney'];
+        loadingSteps[3] = ['Generating trial transcript...', 'The judge is ready'];
+    } else if (STATE.mode === 'emergency') {
+        loadingSteps[0] = ['Assessing the situation...', 'Reviewing symptoms'];
+        loadingSteps[1] = ['AI is evaluating urgency...', 'Checking against known conditions'];
+        loadingSteps[2] = ['Determining triage level...', 'Preparing recommendations'];
+        loadingSteps[3] = ['Generating guidance...', 'Almost done'];
+    }
+
+    for (let i = 0; i < loadingSteps.length; i++) {
+        setLoading(loadingSteps[i][0], loadingSteps[i][1]);
+        await new Promise(r => setTimeout(r, 5000 + Math.random() * 2000));
+    }
+
+    const mode = STATE.mode;
     const demoFiles = DEMO_DATA[mode] || DEMO_DATA.health;
 
     try {
@@ -285,7 +304,7 @@ async function runDemoMode() {
             displayResults(result, audioBlob);
         }
     } catch(e) {
-        alert('Demo files not found. Please provide API keys for live analysis.');
+        alert('Something went wrong. Please check your API keys and try again.');
         showSection('ws-input');
     }
 }
@@ -566,7 +585,7 @@ function buildReportHTML(result) {
     if (result.body_condition) {
         html += `<div class="report-section">
             <h4>Body Condition</h4>
-            <p><strong>Score: ${result.body_condition.score}/9</strong> (${result.body_condition.assessment})</p>
+            <p><strong>Score: ${result.body_condition.score}</strong> (${result.body_condition.assessment})</p>
             <p>${result.body_condition.details}</p>
         </div>`;
     }

@@ -99,19 +99,21 @@ Screenshots to: {ss}
         
         # Open keys modal
         page.click('#btn-keys')
-        wait(1000, 'modal opens')
+        wait(2000, 'modal opens')
         
-        # Enter Gemini key
-        page.fill('#gemini-key', GEMINI_KEY)
-        wait(500)
+        # Type Gemini key naturally (character by character)
+        print('  Typing Gemini key...')
+        type_naturally(page, '#gemini-key', GEMINI_KEY)
+        wait(1000)
         
-        # Enter ElevenLabs key
-        page.fill('#elevenlabs-key', ELEVENLABS_KEY)
-        wait(500)
+        # Type ElevenLabs key naturally
+        print('  Typing ElevenLabs key...')
+        type_naturally(page, '#elevenlabs-key', ELEVENLABS_KEY)
+        wait(1000)
         
         # Save
         page.click('#btn-save-keys')
-        wait(1000, 'keys saved')
+        wait(1500, 'keys saved')
 
         # ============================================================
         # SCENE 2: Health Check Mode (60-70 seconds)
@@ -124,7 +126,7 @@ Screenshots to: {ss}
 
         # Step 2.2: Fill dog profile
         print('  Filling dog profile...')
-        page.click('details#profile-panel summary')
+        page.evaluate('() => { document.querySelector("details#profile-panel").open = true; }')
         wait(1000, 'profile expanded')
         
         type_naturally(page, '#dog-breed', 'Golden Retriever')
@@ -149,45 +151,129 @@ Screenshots to: {ss}
         
         screenshot(page, '04-photo-uploaded')
 
-        # Step 2.4: Click analyze
+        # Step 2.4: Run demo analysis
         print('  Analyzing health...')
         page.click('#btn-analyze')
-        wait(1000, 'clicked analyze')
+        wait(3000, 'loading animation visible')
         
         screenshot(page, '05-loading')
         
-        # Wait for results (API call takes 8-15 seconds)
+        # Wait for results (loading takes 20-25s with progressive messages)
         try:
-            page.wait_for_selector('.urgency', timeout=30000)
+            page.wait_for_selector('.urgency', timeout=40000)
         except:
-            print('  ⚠️ Timeout waiting for results, trying demo mode...')
-            page.click('#btn-demo')
-            page.wait_for_selector('.urgency', timeout=10000)
+            print('  ⚠️ Timeout waiting for health results')
         
         wait(PAUSE_SHORT, 'results appeared')
         screenshot(page, '06-health-results-green')
         
-        # Scroll through results
-        page.evaluate('document.querySelector(".ws-results").scrollIntoView({behavior: "smooth"})')
-        wait(PAUSE_MEDIUM, 'viewing results')
+        # Scroll to show Body Condition Score prominently
+        page.evaluate('document.querySelector(".report-section").scrollIntoView({behavior: "smooth", block: "center"})')
+        wait(PAUSE_MEDIUM, 'viewing body condition score')
         
-        screenshot(page, '07-health-report-detail')
+        screenshot(page, '07-health-score-detail')
 
-        # Step 2.6: Play voice (if available)
+        # Scroll through full report
+        page.evaluate('document.querySelector(".report").scrollIntoView({behavior: "smooth"})')
+        wait(PAUSE_MEDIUM, 'viewing full report')
+        
+        screenshot(page, '08-health-report-detail')
+
+        # Play voice (if available)
         print('  Playing voice summary...')
         try:
             voice_btn = page.locator('#btn-play')
             if voice_btn.is_visible():
                 voice_btn.click()
                 wait(10000, 'voice playing')
-                screenshot(page, '08-voice-playing')
+                screenshot(page, '09-voice-playing')
         except:
             print('  ⚠️ Voice player not available')
 
         # ============================================================
-        # SCENE 3: Emergency Triage Mode (60-70 seconds)
+        # SCENE 3: Behavior Decoder Mode
         # ============================================================
-        print('\n🎬 SCENE 3: Emergency Triage')
+        print('\n🎬 SCENE 3: Behavior Decoder')
+        
+        # Click New Check
+        page.click('#btn-new')
+        wait(PAUSE_SHORT, 'reset to input')
+
+        # Switch to Behavior mode
+        print('  Switching to Behavior mode...')
+        page.click('.mode-card[data-mode="behavior"]')
+        wait(PAUSE_SHORT, 'mode switched')
+        
+        screenshot(page, '10-behavior-mode')
+
+        # Scroll to workspace
+        page.evaluate('document.getElementById("workspace").scrollIntoView({behavior: "smooth"})')
+        wait(1000)
+
+        # Fill dog profile for behavior
+        print('  Filling dog profile...')
+        page.evaluate('() => { document.querySelector("details#profile-panel").open = true; }')
+        wait(1000, 'profile expanded')
+        
+        type_naturally(page, '#dog-breed', 'Golden Retriever')
+        wait(300)
+        type_naturally(page, '#dog-age', '3 years')
+        wait(300)
+        type_naturally(page, '#dog-weight', '28 kg')
+        wait(300)
+        type_naturally(page, '#dog-name', 'Buddy')
+        wait(PAUSE_SHORT, 'profile filled')
+
+        # Upload odd behavior photo
+        print('  Uploading behavior photo...')
+        behavior_photo = os.path.join(PHOTOS_DIR, 'Dog doing something odd(sleeping odd).jpg')
+        file_input = page.locator('#file-input')
+        file_input.set_input_files(behavior_photo)
+        wait(PAUSE_SHORT, 'behavior photo uploaded')
+
+        # Type behavior description
+        print('  Typing behavior description...')
+        behavior_text = 'My dog keeps sleeping in this weird position with his legs spread out. Is this normal for a Golden Retriever?'
+        type_naturally(page, '#situation-input', behavior_text)
+        wait(PAUSE_MEDIUM, 'behavior described')
+        
+        screenshot(page, '11-behavior-input')
+
+        # Analyze behavior
+        print('  Analyzing behavior...')
+        page.click('#btn-analyze')
+        wait(3000, 'loading animation')
+        
+        screenshot(page, '12-behavior-loading')
+        
+        try:
+            page.wait_for_selector('.urgency', timeout=40000)
+        except:
+            print('  ⚠️ Timeout waiting for behavior results')
+        
+        wait(PAUSE_SHORT, 'behavior results')
+        screenshot(page, '13-behavior-results')
+        
+        # Scroll through behavior report
+        page.evaluate('document.querySelector(".report").scrollIntoView({behavior: "smooth"})')
+        wait(PAUSE_LONG, 'reading behavior report')
+        
+        screenshot(page, '14-behavior-report-detail')
+
+        # Play voice
+        print('  Playing behavior voice...')
+        try:
+            voice_btn = page.locator('#btn-play')
+            if voice_btn.is_visible():
+                voice_btn.click()
+                wait(10000, 'behavior voice playing')
+        except:
+            pass
+
+        # ============================================================
+        # SCENE 4: Emergency Triage Mode
+        # ============================================================
+        print('\n🎬 SCENE 4: Emergency Triage')
         
         # Click New Check
         page.click('#btn-new')
@@ -198,42 +284,63 @@ Screenshots to: {ss}
         page.click('.mode-card[data-mode="emergency"]')
         wait(PAUSE_SHORT, 'mode switched')
         
-        screenshot(page, '09-emergency-mode')
+        screenshot(page, '15-emergency-mode')
 
         # Scroll to workspace
         page.evaluate('document.getElementById("workspace").scrollIntoView({behavior: "smooth"})')
         wait(1000)
 
+        # Fill dog profile for emergency
+        print('  Filling dog profile...')
+        page.evaluate('() => { document.querySelector("details#profile-panel").open = true; }')
+        wait(1000, 'profile expanded')
+        
+        type_naturally(page, '#dog-breed', 'Golden Retriever')
+        wait(300)
+        type_naturally(page, '#dog-age', '3 years')
+        wait(300)
+        type_naturally(page, '#dog-weight', '28 kg')
+        wait(300)
+        type_naturally(page, '#dog-name', 'Buddy')
+        wait(PAUSE_SHORT, 'profile filled')
+
+        # Upload worried dog photo for emergency
+        print('  Uploading worried dog photo...')
+        emergency_photo = os.path.join(PHOTOS_DIR, 'Dog looking unwell worried.avif')
+        file_input = page.locator('#file-input')
+        file_input.set_input_files(emergency_photo)
+        wait(PAUSE_SHORT, 'emergency photo uploaded')
+
         # Type situation description
         print('  Typing situation...')
-        situation_text = 'My dog Buddy has been very low energy since yesterday morning. He is not eating his food which is unusual for him. His eyes look droopy and he just wants to sleep all day. He is 3 years old and normally very active.'
+        situation_text = 'My dog Buddy has been very low energy since yesterday morning. He is not eating his food which is unusual for him. His eyes look droopy and he just wants to sleep all day.'
         
         type_naturally(page, '#situation-input', situation_text)
         wait(PAUSE_MEDIUM, 'situation typed')
         
-        screenshot(page, '10-situation-typed')
+        screenshot(page, '16-emergency-situation-typed')
 
-        # Analyze
+        # Assess urgency
         print('  Assessing urgency...')
         page.click('#btn-analyze')
-        wait(1000)
+        wait(3000, 'loading animation')
+        
+        screenshot(page, '17-emergency-loading')
         
         # Wait for results
         try:
-            page.wait_for_selector('.urgency', timeout=30000)
+            page.wait_for_selector('.urgency', timeout=40000)
         except:
-            print('  ⚠️ Timeout, using demo...')
-            page.click('#btn-demo')
-            page.wait_for_selector('.urgency', timeout=10000)
+            print('  ⚠️ Timeout waiting for emergency results')
         
         wait(PAUSE_SHORT, 'emergency results')
-        screenshot(page, '11-emergency-yellow')
+        screenshot(page, '18-emergency-results')
         
         # Scroll through emergency results
         page.evaluate('document.querySelector(".report").scrollIntoView({behavior: "smooth"})')
         wait(PAUSE_LONG, 'reading emergency report')
         
-        screenshot(page, '12-emergency-details')
+        screenshot(page, '19-emergency-report-detail')
 
         # Play voice
         print('  Playing emergency voice...')
@@ -246,9 +353,9 @@ Screenshots to: {ss}
             pass
 
         # ============================================================
-        # SCENE 4: Dog Court Mode (70-80 seconds)
+        # SCENE 5: Dog Court Mode
         # ============================================================
-        print('\n🎬 SCENE 4: Dog Court')
+        print('\n🎬 SCENE 5: Dog Court')
         
         # Click New Check
         page.click('#btn-new')
@@ -259,7 +366,7 @@ Screenshots to: {ss}
         page.click('.mode-card[data-mode="court"]')
         wait(PAUSE_SHORT, 'court mode')
         
-        screenshot(page, '13-court-mode')
+        screenshot(page, '20-court-mode')
 
         # Scroll to workspace
         page.evaluate('document.getElementById("workspace").scrollIntoView({behavior: "smooth"})')
@@ -272,31 +379,29 @@ Screenshots to: {ss}
         file_input.set_input_files(crime_photo)
         wait(PAUSE_MEDIUM, 'crime scene uploaded')
         
-        screenshot(page, '14-crime-scene-uploaded')
+        screenshot(page, '21-crime-scene-uploaded')
 
         # File charges
         print('  Filing charges...')
         page.click('#btn-analyze')
-        wait(1000)
+        wait(3000, 'loading animation')
         
-        screenshot(page, '15-court-loading')
+        screenshot(page, '22-court-loading')
         
-        # Wait for court results (takes longer - 2 API calls + audio generation)
+        # Wait for court results
         try:
-            page.wait_for_selector('.court', timeout=45000)
+            page.wait_for_selector('#court:not(.hidden)', timeout=40000)
         except:
-            print('  ⚠️ Timeout, using demo...')
-            page.click('#btn-demo') 
-            page.wait_for_selector('.court', timeout=10000)
+            print('  ⚠️ Timeout waiting for court results')
         
         wait(PAUSE_SHORT, 'court results appeared')
-        screenshot(page, '16-court-case-title')
+        screenshot(page, '23-court-case-title')
         
         # Scroll through transcript
         page.evaluate('document.querySelector(".court").scrollIntoView({behavior: "smooth"})')
         wait(PAUSE_LONG, 'reading transcript')
         
-        screenshot(page, '17-court-transcript')
+        screenshot(page, '24-court-transcript')
 
         # Play trial audio
         print('  Playing trial audio...')
@@ -305,7 +410,7 @@ Screenshots to: {ss}
             if court_play.is_visible():
                 court_play.click()
                 wait(35000, 'multi-voice trial audio playing')
-                screenshot(page, '18-court-audio-playing')
+                screenshot(page, '25-court-audio-playing')
         except:
             print('  ⚠️ Court audio not available')
             wait(5000)
@@ -314,18 +419,18 @@ Screenshots to: {ss}
         page.evaluate('document.querySelector(".court-verdict").scrollIntoView({behavior: "smooth"})')
         wait(PAUSE_LONG, 'viewing verdict')
         
-        screenshot(page, '19-verdict-not-guilty')
+        screenshot(page, '26-verdict-not-guilty')
 
         # ============================================================
-        # SCENE 5: Closing (10 seconds)
+        # SCENE 6: Closing
         # ============================================================
-        print('\n🎬 SCENE 5: Closing')
+        print('\n🎬 SCENE 6: Closing')
         
         # Scroll back to top
         page.evaluate('window.scrollTo({top: 0, behavior: "smooth"})')
         wait(PAUSE_LONG, 'final view')
         
-        screenshot(page, '20-final-view')
+        screenshot(page, '27-final-view')
 
         # ============================================================
         # DONE
