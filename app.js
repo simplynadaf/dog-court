@@ -211,7 +211,6 @@ function resetToStart() {
     removeImage();
     document.getElementById('situation-input').value = '';
     showSection('ws-input');
-    document.getElementById('results-section').classList.add('hidden');
 }
 
 function showSection(id) {
@@ -666,7 +665,7 @@ function displayCourtResults(script, audioBlob) {
     const courtSection = document.getElementById('court');
     courtSection.classList.remove('hidden');
 
-    document.getElementById('court-case-title').textContent = script.case_title || 'The People vs. Dog';
+    document.getElementById('court-title').textContent = script.case_title || 'The People vs. Dog';
     document.getElementById('court-charge').textContent = `Charge: ${script.charge || 'Being too cute'}`;
 
     // Transcript
@@ -690,7 +689,7 @@ function displayCourtResults(script, audioBlob) {
     `;
 
     // Audio
-    const playBtn = document.getElementById('btn-play-court');
+    const playBtn = document.getElementById('court-play');
     if (audioBlob) {
         const url = URL.createObjectURL(audioBlob);
         const audio = new Audio(url);
