@@ -3,7 +3,7 @@ title: "59% of Dogs Are Obese and Their Owners Don't Know. So I Built an AI That
 published: false
 tags: devchallenge, weekendchallenge, ai, showdev
 description: "PawWise uses Google AI to analyze your dog's health from a photo, decode confusing behavior, triage emergencies, and (when things are fine) put your dog on trial for their crimes."
-cover_image: 
+cover_image: https://img.youtube.com/vi/vqyF_65Qc_s/maxresdefault.jpg
 ---
 
 *This is a submission for [Weekend Challenge: Dog Days Edition](https://dev.to/challenges/weekend-2026-08-13)*
@@ -92,7 +92,7 @@ Crime Photo → Gemini Vision (analyze "crime scene")
 
 ### Technical Decisions
 
-**Google Gemini 2.0 Flash** for all AI analysis. Multimodal (understands images natively), supports structured JSON output (no parsing errors), and the free tier is generous enough for a real app. I use the `responseMimeType: 'application/json'` parameter to guarantee structured responses.
+**Google Gemini 3.5 Flash** for all AI analysis. Multimodal (understands images natively), supports structured JSON output (no parsing errors), and the free tier is generous enough for a real app. I use the `responseMimeType: 'application/json'` parameter to guarantee structured responses.
 
 **ElevenLabs Text-to-Dialogue API** is the secret weapon for Dog Court. One API call, multiple voice IDs, one cohesive audio output. Each character gets their own voice and emotion tags like `[dramatically]` or `[innocently]`. The result sounds like a produced audio drama, not stitched TTS clips.
 
