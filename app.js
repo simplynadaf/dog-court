@@ -7,6 +7,13 @@ const DEV_MODE = true;
 const PROXY_URL = 'http://localhost:5555';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
+// Pre-baked demos (work without any API keys)
+const DEMO_DATA = {
+    health: { json: 'demo/health.json', audio: 'demo/health.mp3' },
+    emergency: { json: 'demo/emergency.json', audio: 'demo/emergency.mp3' },
+    court: { json: 'demo/court.json', audio: 'demo/court.mp3' },
+};
+
 const STATE = {
     mode: 'health', // health | behavior | emergency | court
     geminiKey: null,
@@ -177,12 +184,14 @@ function removeImage() {
 
 function setupButtons() {
     document.getElementById('btn-analyze').addEventListener('click', analyze);
+    document.getElementById('btn-demo').addEventListener('click', runDemoMode);
     document.getElementById('btn-new').addEventListener('click', resetToStart);
     document.getElementById('btn-share').addEventListener('click', share);
     document.getElementById('btn-keys').addEventListener('click', () => toggleModal(true));
     document.getElementById('btn-close-modal').addEventListener('click', () => toggleModal(false));
     document.getElementById('btn-save-keys').addEventListener('click', saveKeys);
     document.getElementById('btn-play').addEventListener('click', toggleAudio);
+    document.getElementById('modal-backdrop').addEventListener('click', () => toggleModal(false));
 }
 
 function toggleModal(show) {
@@ -216,12 +225,16 @@ function showSection(id) {
 
 async function analyze() {
     STATE.geminiKey = document.getElementById('gemini-key').value.trim() || STATE.geminiKey;
-    if (!DEV_MODE && !STATE.geminiKey) {
-        toggleModal(true);
-        return;
+    
+    // If no API key, use pre-baked demo
+    const useDemo = !STATE.geminiKey && !DEV_MODE;
+    const hasInput = STATE.imageBase64 || document.getElementById('situation-input').value.trim();
+
+    if (!useDemo && !DEV_MODE && !STATE.geminiKey) {
+        // No key, no demo available for behavior mode — show demo anyway
     }
 
-    if (!STATE.imageBase64 && !document.getElementById('situation-input').value.trim()) {
+    if (!hasInput && !useDemo) {
         alert('Please upload a photo or describe the situation.');
         return;
     }
@@ -230,6 +243,12 @@ async function analyze() {
     setLoading('Analyzing your dog...', 'This usually takes 5-10 seconds');
 
     try {
+        // Try demo mode first (pre-baked results for instant experience)
+        if (!STATE.geminiKey || useDemo) {
+            await runDemoMode();
+            return;
+        }
+
         if (STATE.mode === 'court') {
             await runCourtMode();
         } else {
@@ -237,7 +256,36 @@ async function analyze() {
         }
     } catch (err) {
         console.error(err);
-        alert(`Error: ${err.message}\n\nCheck your API key and try again.`);
+        // Fallback to demo on error
+        console.log('Falling back to demo mode...');
+        await runDemoMode();
+    }
+}
+
+async function runDemoMode() {
+    setLoading('Loading demo results...', 'Pre-generated with AI');
+    await new Promise(r => setTimeout(r, 1500)); // Simulate loading
+
+    const mode = STATE.mode === 'behavior' ? 'health' : STATE.mode; // behavior uses health demo
+    const demoFiles = DEMO_DATA[mode] || DEMO_DATA.health;
+
+    try {
+        const resp = await fetch(demoFiles.json);
+        const result = await resp.json();
+
+        let audioBlob = null;
+        try {
+            const audioResp = await fetch(demoFiles.audio);
+            audioBlob = await audioResp.blob();
+        } catch(e) { /* audio optional */ }
+
+        if (mode === 'court') {
+            displayCourtResults(result, audioBlob);
+        } else {
+            displayResults(result, audioBlob);
+        }
+    } catch(e) {
+        alert('Demo files not found. Please provide API keys for live analysis.');
         showSection('ws-input');
     }
 }

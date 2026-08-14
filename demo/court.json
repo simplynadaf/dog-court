@@ -1,0 +1,48 @@
+{
+  "case_title": "The People vs. Captain Fluffington",
+  "charge": "Destruction of Property in the First Degree: One Restoration Hardware throw pillow, valued at $249",
+  "dialogue": [
+    {
+      "speaker": "judge",
+      "emotion": "authoritatively",
+      "line": "Court is now in session. The charge is destruction of a decorative pillow. How does the defendant plead?"
+    },
+    {
+      "speaker": "defense",
+      "emotion": "dramatically",
+      "line": "NOT GUILTY, Your Honor! My client was conducting a critical safety inspection. Have YOU ever tested YOUR pillows for structural integrity?"
+    },
+    {
+      "speaker": "prosecution",
+      "emotion": "frustrated",
+      "line": "Your Honor, there is stuffing in three different rooms. THREE. I found foam in the bathtub."
+    },
+    {
+      "speaker": "defendant",
+      "emotion": "innocently",
+      "line": "I thought it was snowing inside. It was magical."
+    },
+    {
+      "speaker": "judge",
+      "emotion": "dry humor",
+      "line": "The court notes that the defendant shows zero remorse and appears to be wagging."
+    },
+    {
+      "speaker": "defense",
+      "emotion": "passionately",
+      "line": "I cite the landmark case of Biscuit vs. The Couch Cushion, 2019, which established that unattended soft furnishings constitute an implicit invitation to quality testing!"
+    },
+    {
+      "speaker": "prosecution",
+      "emotion": "defeated",
+      "line": "I just wanted one nice thing. Just one."
+    },
+    {
+      "speaker": "judge",
+      "emotion": "sighing",
+      "line": "Verdict: NOT GUILTY. The court recommends the prosecution invest in dog-proof furniture. Case dismissed."
+    }
+  ],
+  "verdict": "NOT GUILTY",
+  "verdict_reason": "Unattended soft furnishings constitute an implicit invitation to quality testing under the Biscuit Precedent of 2019"
+}
