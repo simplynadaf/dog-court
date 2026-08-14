@@ -10,6 +10,7 @@ const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemi
 // Pre-baked demos (work without any API keys)
 const DEMO_DATA = {
     health: { json: 'demo/health.json', audio: 'demo/health.mp3' },
+    behavior: { json: 'demo/behavior.json', audio: 'demo/behavior.mp3' },
     emergency: { json: 'demo/emergency.json', audio: 'demo/emergency.mp3' },
     court: { json: 'demo/court.json', audio: 'demo/court.mp3' },
 };

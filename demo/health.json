@@ -1,42 +1,44 @@
 {
   "urgency": "green",
-  "urgency_label": "Your dog looks healthy and happy!",
+  "urgency_label": "no immediate concerns",
   "body_condition": {
     "score": "5/9",
     "assessment": "ideal",
-    "details": "Good muscle tone visible, waist clearly defined from above, ribs palpable with slight fat cover"
+    "details": "Buddy's body condition appears ideal, with a visible waist and ribs that are not overly prominent."
   },
   "observations": [
     {
       "area": "Coat",
       "status": "good",
-      "note": "Shiny, full coat with no patches or excessive shedding visible"
+      "note": "Buddy's coat is shiny and well-maintained, indicating good health."
     },
     {
       "area": "Eyes",
       "status": "good",
-      "note": "Bright, clear eyes with no discharge or redness"
+      "note": "Buddy's eyes are clear and bright, with no signs of discharge or redness."
     },
     {
       "area": "Posture",
       "status": "good",
-      "note": "Balanced stance, no favoring of limbs, head held naturally"
+      "note": "Buddy's posture is upright and balanced, with no signs of discomfort or pain."
     },
     {
       "area": "Energy",
       "status": "good",
-      "note": "Alert expression, engaged with environment, tail position relaxed"
+      "note": "Buddy appears alert and engaged, with a confident stance."
     }
   ],
   "breed_risks": [
-    "Hip dysplasia (common in retrievers, watch for stiffness after rest)",
-    "Ear infections (floppy ears trap moisture)",
-    "Obesity (retrievers are food-motivated, monitor portions)"
+    "hip dysplasia",
+    "elbow dysplasia",
+    "osteochondritis dissecans",
+    "cancer"
   ],
   "action_items": [
-    "Schedule annual vet checkup if not done in last 12 months",
-    "Monitor weight quarterly since retrievers gain easily",
-    "Check ears weekly for redness or odor"
+    "Regular veterinary check-ups",
+    "Maintain a healthy diet",
+    "Provide regular exercise and mental stimulation",
+    "Monitor for any changes in behavior or physical condition"
   ],
-  "voice_summary": "Hey there! Your golden retriever looks great. Healthy weight, shiny coat, bright eyes, and good energy. Just keep an eye on those floppy ears for infections, and watch the portions since retrievers love to eat. Overall, you're doing a great job!"
+  "voice_summary": "Hey there! Buddy looks great! His coat is shiny and well-maintained, his eyes are clear, and his posture is upright. Keep up the good work with his care!"
 }

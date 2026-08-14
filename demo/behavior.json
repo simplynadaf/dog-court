@@ -1,0 +1,18 @@
+{
+  "urgency": "green",
+  "urgency_label": "Normal sleeping position",
+  "behavior_explanation": "Buddy is likely sleeping in this position because it is comfortable for him. Dogs often stretch out when they are relaxed and feel safe.",
+  "is_normal": true,
+  "breed_context": "Golden Retrievers, like many other breeds, enjoy stretching out when they sleep. This position allows them to cool down and relax.",
+  "possible_causes": [
+    "Comfort",
+    "Relaxation",
+    "Temperature regulation"
+  ],
+  "what_to_do": [
+    "Ensure Buddy has a comfortable sleeping area",
+    "Monitor his sleeping positions for any changes"
+  ],
+  "when_to_worry": "If Buddy starts showing signs of discomfort or if this position changes suddenly, it may be worth consulting a vet.",
+  "voice_summary": "Hi there! It's completely normal for Buddy to sleep like this. He's just finding a comfortable and relaxing position. Keep an eye on him, but there's no need to worry."
+}
