@@ -2,6 +2,11 @@
 // PawWise — AI Vet Friend
 // ============================================================
 
+// DEV MODE: Set to true to use local Bedrock proxy instead of Gemini
+const DEV_MODE = true;
+const PROXY_URL = 'http://localhost:5555';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+
 const STATE = {
     mode: 'health', // health | behavior | emergency | court
     geminiKey: null,
@@ -70,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function loadKeys() {
     STATE.geminiKey = localStorage.getItem('pawwise_gemini') || '';
-    STATE.elevenLabsKey = localStorage.getItem('pawwise_eleven') || '';
+    STATE.elevenLabsKey = localStorage.getItem('pawwise_eleven') || 'sk_b0d6f61247491565e30be41ba7f460099b6cacf7a9f686a1';
     if (STATE.geminiKey) document.getElementById('gemini-key').value = STATE.geminiKey;
     if (STATE.elevenLabsKey) document.getElementById('elevenlabs-key').value = STATE.elevenLabsKey;
 }
@@ -80,7 +85,7 @@ function loadKeys() {
 // ============================================================
 
 function setupModes() {
-    document.querySelectorAll('.mode-btn').forEach(btn => {
+    document.querySelectorAll('.mode-card').forEach(btn => {
         btn.addEventListener('click', () => {
             const mode = btn.dataset.mode;
             switchMode(mode);
@@ -93,25 +98,25 @@ function switchMode(mode) {
     const config = MODES[mode];
 
     // Update active button
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+    document.querySelectorAll('.mode-card').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.mode-card[data-mode="${mode}"]`).classList.add('active');
 
     // Update description
-    document.getElementById('mode-title').textContent = config.title;
-    document.getElementById('mode-subtitle').textContent = config.subtitle;
+    document.getElementById('ws-title').textContent = config.title;
+    document.getElementById('ws-subtitle').textContent = config.subtitle;
     document.getElementById('btn-analyze-text').textContent = config.btnText;
 
     // Show/hide text input
-    const textSection = document.getElementById('text-input-section');
+    const textSection = document.getElementById('text-area');
     if (config.showText) {
         textSection.classList.remove('hidden');
-        document.getElementById('input-hint').textContent = config.inputHint;
+        document.getElementById('text-hint').textContent = config.inputHint;
     } else {
         textSection.classList.add('hidden');
     }
 
     // Reset view
-    showSection('upload-section');
+    showSection('ws-input');
 }
 
 // ============================================================
@@ -195,12 +200,12 @@ function saveKeys() {
 function resetToStart() {
     removeImage();
     document.getElementById('situation-input').value = '';
-    showSection('upload-section');
+    showSection('ws-input');
     document.getElementById('results-section').classList.add('hidden');
 }
 
 function showSection(id) {
-    ['upload-section', 'loading-section', 'results-section'].forEach(s => {
+    ['ws-input', 'ws-loading', 'ws-results'].forEach(s => {
         document.getElementById(s).classList.toggle('hidden', s !== id);
     });
 }
@@ -211,7 +216,7 @@ function showSection(id) {
 
 async function analyze() {
     STATE.geminiKey = document.getElementById('gemini-key').value.trim() || STATE.geminiKey;
-    if (!STATE.geminiKey) {
+    if (!DEV_MODE && !STATE.geminiKey) {
         toggleModal(true);
         return;
     }
@@ -221,7 +226,7 @@ async function analyze() {
         return;
     }
 
-    showSection('loading-section');
+    showSection('ws-loading');
     setLoading('Analyzing your dog...', 'This usually takes 5-10 seconds');
 
     try {
@@ -233,7 +238,7 @@ async function analyze() {
     } catch (err) {
         console.error(err);
         alert(`Error: ${err.message}\n\nCheck your API key and try again.`);
-        showSection('upload-section');
+        showSection('ws-input');
     }
 }
 
@@ -412,17 +417,24 @@ async function callGemini(prompt, includeImage) {
         });
     }
 
-    const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${STATE.geminiKey}`,
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts }],
-                generationConfig: { temperature: 0.8, responseMimeType: 'application/json' }
-            })
-        }
-    );
+    const requestBody = {
+        contents: [{ parts }],
+        generationConfig: { temperature: 0.8, responseMimeType: 'application/json' }
+    };
+
+    // Route to proxy in dev mode, Gemini in production
+    let url;
+    if (DEV_MODE) {
+        url = PROXY_URL;
+    } else {
+        url = `${GEMINI_URL}?key=${STATE.geminiKey}`;
+    }
+
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+    });
 
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -498,7 +510,7 @@ function displayResults(result, audioBlob) {
     document.getElementById('court-results').classList.add('hidden');
     report.classList.remove('hidden');
 
-    showSection('results-section');
+    showSection('ws-results');
 }
 
 function buildReportHTML(result) {
@@ -645,7 +657,7 @@ function displayCourtResults(script, audioBlob) {
         playBtn.classList.add('hidden');
     }
 
-    showSection('results-section');
+    showSection('ws-results');
 }
 
 // ============================================================
@@ -683,7 +695,7 @@ function toggleAudio() {
 // ============================================================
 
 function setLoading(text, sub) {
-    document.getElementById('loading-text').textContent = text;
+    document.getElementById('loading-title').textContent = text;
     document.getElementById('loading-sub').textContent = sub;
 }
 
