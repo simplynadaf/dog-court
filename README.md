@@ -174,12 +174,12 @@ PawWise is an AI tool, not a veterinarian. It's designed to help you make better
 
 **Sarvar Nadaf**
 
-Cloud Architect • 10+ years in Cloud & IT • 7x AWS Certified • AWS Community Builder
-
-[![Dev.to](https://img.shields.io/badge/Dev.to-15K+_followers-0A0A0A?style=flat-square&logo=devdotto)](https://dev.to/simplynadaf)
-[![YouTube](https://img.shields.io/badge/YouTube-@TechwithSarvar-red?style=flat-square&logo=youtube)](https://www.youtube.com/@TechwithSarvar)
-[![GitHub](https://img.shields.io/badge/GitHub-SimplyNadaf-181717?style=flat-square&logo=github)](https://github.com/simplynadaf)
-[![Portfolio](https://img.shields.io/badge/Portfolio-sarvarnadaf.com-blue?style=flat-square&logo=google-chrome)](https://sarvarnadaf.com)
+[![Portfolio](https://img.shields.io/badge/sarvarnadaf.com-Portfolio-blue?style=flat-square&logo=google-chrome)](https://sarvarnadaf.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-sarvar04-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/sarvar04/)
+[![Dev.to](https://img.shields.io/badge/Dev.to-sarvar__04-0A0A0A?style=flat-square&logo=devdotto)](https://dev.to/sarvar_04)
+[![YouTube](https://img.shields.io/badge/YouTube-@Sarvar--Nadaf-red?style=flat-square&logo=youtube)](https://www.youtube.com/@Sarvar-Nadaf)
+[![X](https://img.shields.io/badge/X-@SarvarN__04-000000?style=flat-square&logo=x)](https://x.com/SarvarN_04)
+[![AWS Builder](https://img.shields.io/badge/AWS-Community_Builder-FF9900?style=flat-square&logo=amazonaws)](https://builder.aws.com/community/@sarvar)
 [![Email](https://img.shields.io/badge/Email-simplynadaf@gmail.com-D14836?style=flat-square&logo=gmail)](mailto:simplynadaf@gmail.com)
 
 </div>
