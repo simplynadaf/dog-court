@@ -1,98 +1,86 @@
-# 🏛️ DOG COURT — Your Dog Pleads Their Case
+# 🐾 PawWise — Your AI Vet Friend
 
-> Every dog deserves their day in court.
+> 59% of dogs are obese and their owners don't know. 60% of serious health issues are caught too late. I built an AI that catches it in a photo.
 
-Upload a photo of your dog's "crime" and watch as AI generates a full courtroom drama — complete with a judge, defense attorney, prosecution, and voice-acted trial.
-
-![DOG COURT Screenshot](screenshots/demo.png)
+Upload a photo of your dog — get instant health checks, behavior explanations, emergency triage, and (when your dog is healthy) a courtroom drama about their latest crime.
 
 ## 🎯 What It Does
 
-1. **Upload** a photo of your dog's crime scene (chewed shoes, destroyed pillows, stolen food...)
-2. **Google Gemini** analyzes the evidence and writes a hilarious courtroom script
-3. **ElevenLabs Text-to-Dialogue** voices multiple characters in a single dramatic audio
-4. **Listen** to the full trial and discover the verdict
+### 🏥 Health Check
+Upload a photo → AI assesses body condition score, coat health, posture, eyes, and flags breed-specific risks. Catches the subtle signs that 60% of owners miss.
 
-## 🎙️ Characters
+### 🧠 Behavior Decoder  
+"Why is my dog doing this?" → Breed-specific explanations, whether it's normal, what's causing it, and what to do. Prevents the misunderstanding → frustration → shelter surrender cycle.
 
-| Character | Role |
-|-----------|------|
-| 🧑‍⚖️ **Judge Barksworth** | Stern, world-weary, dry humor |
-| 🦮 **Defense Attorney Rex** | Theatrical, uses absurd legal precedents |
-| 👤 **The Prosecution** | Exasperated human owner |
-| 🐕 **The Defendant** | Confused but endearing |
+### 🚨 Emergency Triage
+"My dog ate chocolate" or "limping since yesterday" → Green/Yellow/Orange/Red urgency + first aid steps + when to rush to the vet. Saves $653 panic visits AND catches real emergencies.
+
+### 🏛️ Dog Court (Fun Mode)
+Your dog is healthy? Put them on trial for their crimes! Upload evidence of destroyed shoes → AI generates a full multi-voice courtroom drama.
+
+## 📊 The Problem (Real Data)
+
+| Crisis | Scale |
+|--------|-------|
+| Dogs overweight/obese | 59-65% in the US |
+| Health issues caught too late | 60% (AVMA) |
+| Owners can't spot pain | Same accuracy as non-owners (2026 study) |
+| Separation anxiety | 17-29% clinical prevalence |
+| Emergency vet panic visits | $653 average, often unnecessary |
+| Dogs surrendered to shelters | 28% due to behavior misunderstanding |
+| Dogs killed in shelters annually | 359,000+ (2023 peak) |
 
 ## 🛠️ Tech Stack
 
-- **Google AI (Gemini 2.0 Flash)** — Multimodal image analysis + structured script generation
-- **ElevenLabs Text-to-Dialogue API** — Multi-voice courtroom drama in a single audio
-- **Vanilla HTML/CSS/JS** — No framework, just clean code
+- **Google AI (Gemini 2.0 Flash)** — Multimodal image analysis, structured JSON output, breed-aware health assessment
+- **ElevenLabs** — Voice summaries (Text-to-Speech) + multi-character courtroom drama (Text-to-Dialogue API)
+- **Vanilla HTML/CSS/JS** — Zero dependencies, instant load, works everywhere
 
 ## 🚀 Try It
 
-### Live Demo
-[→ dog-court.vercel.app](https://dog-court.vercel.app) *(coming soon)*
+**Live:** [simplynadaf.github.io/dog-court](https://simplynadaf.github.io/dog-court)
 
-### Run Locally
+**Local:**
 ```bash
-# Clone
 git clone https://github.com/SimplyNadaf/dog-court.git
 cd dog-court
-
-# Serve (any static server works)
 npx serve .
-# or
-python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000` and enter your API keys.
-
-### Get API Keys (Free)
+### API Keys (Free)
 - **Google AI Studio**: [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
-- **ElevenLabs**: [elevenlabs.io/app/settings/api-keys](https://elevenlabs.io/app/settings/api-keys)
-
-## 📁 Project Structure
-
-```
-dog-court/
-├── index.html      # Courtroom UI
-├── style.css       # Mahogany & gold courthouse theme
-├── app.js          # API orchestration + audio playback
-├── audio/          # Pre-generated sample trials
-└── screenshots/    # Demo screenshots
-```
+- **ElevenLabs** (optional, for voice): [elevenlabs.io/app/settings/api-keys](https://elevenlabs.io/app/settings/api-keys)
 
 ## 🏆 Prize Categories
 
-- ✅ **Best Use of Google AI** — Gemini multimodal image analysis + JSON structured output
-- ✅ **Best Use of ElevenLabs** — Text-to-Dialogue API for multi-character voice drama
+- ✅ **Best Use of Google AI** — Gemini multimodal image analysis + structured output for health triage
+- ✅ **Best Use of ElevenLabs** — Voice health summaries + Text-to-Dialogue courtroom drama
 
-## 📝 How It Works
+## 🔬 How It Works
 
-### 1. Crime Scene Analysis (Gemini Vision)
 ```
-Photo → Gemini 2.0 Flash → {crime, evidence, breed, severity}
+┌──────────────────────────────────────────────────┐
+│ User uploads photo + selects mode                │
+├──────────────────────────────────────────────────┤
+│                                                  │
+│  Health Mode:                                    │
+│  Photo → Gemini Vision → Body condition,         │
+│  coat, posture, breed risks → Voice summary      │
+│                                                  │
+│  Emergency Mode:                                 │
+│  Description + Photo → Gemini Triage →           │
+│  🟢🟡🟠🔴 Urgency + First aid + When to go      │
+│                                                  │
+│  Dog Court Mode:                                 │
+│  Crime photo → Gemini script → ElevenLabs        │
+│  Text-to-Dialogue → Multi-voice trial audio      │
+│                                                  │
+└──────────────────────────────────────────────────┘
 ```
 
-### 2. Script Generation (Gemini Text)
-```
-Crime analysis → Gemini → Structured courtroom script (JSON)
-```
+## ⚠️ Disclaimer
 
-### 3. Voice Acting (ElevenLabs Text-to-Dialogue)
-```
-Script → Multiple voice_ids + emotion tags → Single audio output
-```
-
-## 🎬 Sample Verdicts
-
-> **Case #472: The People vs. Muffin**
-> Charge: Destruction of Property in the First Degree
-> Verdict: NOT GUILTY — by reason of extreme cuteness and insufficient morning walks
-
-> **Case #891: The People vs. Sir Barks-a-Lot**
-> Charge: Grand Theft Sandwich
-> Verdict: NOT GUILTY — food left unattended for 3+ seconds constitutes abandonment under the Finders Keepers Act of 2019
+PawWise is an AI tool, not a veterinarian. It's designed to help you make better decisions about your dog's health — not replace professional veterinary care. When in doubt, always see your vet.
 
 ## 📄 License
 
@@ -100,4 +88,4 @@ MIT — Built for [DEV Weekend Challenge: Dog Days Edition](https://dev.to/chall
 
 ---
 
-Built with ❤️ and a chewed-up throw pillow by [Sarvar Nadaf](https://dev.to/simplynadaf)
+Built with ❤️ by [Sarvar Nadaf](https://dev.to/simplynadaf) — because no dog should suffer in silence while their owner thinks everything is fine.

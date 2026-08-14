@@ -3,131 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏛️ DOG COURT — Your Dog Pleads Their Case</title>
-    <link rel="stylesheet" href="style.css">
+    <title>PawWise — Your AI Vet Friend</title>
+    <meta name="description" content="Upload a photo of your dog. Get instant health checks, behavior explanations, and emergency triage — powered by Google AI and ElevenLabs.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app">
-        <!-- Landing / Upload Screen -->
-        <section id="screen-upload" class="screen active">
-            <div class="hero">
-                <div class="gavel-icon">🏛️</div>
-                <h1>DOG COURT</h1>
-                <p class="tagline">Every dog deserves their day in court.</p>
-                <p class="subtitle">Upload a photo of your dog's crime. AI will generate a full courtroom trial — complete with judge, defense attorney, prosecution, and voice-acted drama.</p>
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🐾</span>
+                <span class="logo-text">PawWise</span>
             </div>
+            <button class="btn-keys" id="btn-keys" title="API Keys">🔑</button>
+        </header>
 
-            <div class="upload-zone" id="upload-zone">
-                <div class="upload-content">
-                    <div class="upload-icon">📸</div>
-                    <p class="upload-text">Drop your evidence here</p>
-                    <p class="upload-hint">Photo of the crime scene (chewed shoes, destroyed pillows, stolen food...)</p>
-                    <button class="btn-upload" id="btn-browse">Choose File</button>
+        <!-- Mode Selector -->
+        <nav class="modes" id="modes">
+            <button class="mode-btn active" data-mode="health">
+                <span class="mode-icon">🏥</span>
+                <span class="mode-label">Health Check</span>
+            </button>
+            <button class="mode-btn" data-mode="behavior">
+                <span class="mode-icon">🧠</span>
+                <span class="mode-label">Behavior</span>
+            </button>
+            <button class="mode-btn" data-mode="emergency">
+                <span class="mode-icon">🚨</span>
+                <span class="mode-label">Emergency</span>
+            </button>
+            <button class="mode-btn" data-mode="court">
+                <span class="mode-icon">🏛️</span>
+                <span class="mode-label">Dog Court</span>
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main">
+            <!-- Upload Section -->
+            <section class="upload-section" id="upload-section">
+                <div class="mode-description" id="mode-description">
+                    <h2 id="mode-title">Health Check</h2>
+                    <p id="mode-subtitle">Upload a photo of your dog. AI will assess body condition, coat health, posture, and flag anything to watch for.</p>
                 </div>
-                <input type="file" id="file-input" accept="image/*" hidden>
-            </div>
 
-            <div class="preview-area hidden" id="preview-area">
-                <img id="preview-img" alt="Crime scene evidence">
-                <div class="preview-label">📋 Exhibit A</div>
-                <button class="btn-primary" id="btn-file-charges">⚖️ File Charges</button>
-            </div>
+                <div class="upload-zone" id="upload-zone">
+                    <div class="upload-content">
+                        <div class="upload-icon">📸</div>
+                        <p class="upload-text">Drop a photo of your dog</p>
+                        <p class="upload-hint">Clear, well-lit photo works best</p>
+                        <button class="btn-upload">Choose Photo</button>
+                    </div>
+                    <input type="file" id="file-input" accept="image/*" hidden>
+                </div>
 
-            <div class="api-keys-section">
-                <details>
-                    <summary>🔑 API Keys (required for first use)</summary>
-                    <div class="api-form">
-                        <div class="field">
-                            <label for="gemini-key">Google AI (Gemini) API Key</label>
-                            <input type="password" id="gemini-key" placeholder="AIza...">
-                            <a href="https://aistudio.google.com/apikey" target="_blank" class="key-link">Get free key →</a>
+                <!-- Text input for behavior/emergency modes -->
+                <div class="text-input-section hidden" id="text-input-section">
+                    <textarea id="situation-input" placeholder="Describe what's happening..." rows="3"></textarea>
+                    <p class="input-hint" id="input-hint">E.g., "My dog has been limping for 2 days but still eating normally"</p>
+                </div>
+
+                <!-- Dog Profile (optional) -->
+                <details class="dog-profile" id="dog-profile">
+                    <summary>🐕 Add dog's details (better results)</summary>
+                    <div class="profile-fields">
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Breed</label>
+                                <input type="text" id="dog-breed" placeholder="e.g., Labrador">
+                            </div>
+                            <div class="field">
+                                <label>Age</label>
+                                <input type="text" id="dog-age" placeholder="e.g., 4 years">
+                            </div>
                         </div>
-                        <div class="field">
-                            <label for="elevenlabs-key">ElevenLabs API Key</label>
-                            <input type="password" id="elevenlabs-key" placeholder="sk_...">
-                            <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" class="key-link">Get free key →</a>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Weight</label>
+                                <input type="text" id="dog-weight" placeholder="e.g., 30 kg">
+                            </div>
+                            <div class="field">
+                                <label>Name</label>
+                                <input type="text" id="dog-name" placeholder="e.g., Max">
+                            </div>
                         </div>
-                        <button class="btn-secondary" id="btn-save-keys">Save Keys</button>
                     </div>
                 </details>
-            </div>
-        </section>
 
-        <!-- Processing Screen -->
-        <section id="screen-processing" class="screen">
-            <div class="processing-container">
-                <div class="spinner"></div>
-                <h2 id="processing-status">Analyzing the crime scene...</h2>
-                <div class="progress-steps">
-                    <div class="step" id="step-analyze">
-                        <span class="step-icon">🔍</span>
-                        <span class="step-text">Analyzing evidence</span>
-                    </div>
-                    <div class="step" id="step-script">
-                        <span class="step-icon">📝</span>
-                        <span class="step-text">Writing courtroom script</span>
-                    </div>
-                    <div class="step" id="step-voices">
-                        <span class="step-icon">🎙️</span>
-                        <span class="step-text">Voice-acting the trial</span>
-                    </div>
-                    <div class="step" id="step-sfx">
-                        <span class="step-icon">🔊</span>
-                        <span class="step-text">Adding courtroom atmosphere</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Trial Screen -->
-        <section id="screen-trial" class="screen">
-            <div class="courtroom">
-                <div class="case-header">
-                    <span class="case-number" id="case-number">Case #472</span>
-                    <h2 id="case-title">The People vs. Muffin</h2>
-                    <p class="charge" id="case-charge">Charge: Destruction of Property in the First Degree</p>
+                <!-- Preview -->
+                <div class="preview hidden" id="preview">
+                    <img id="preview-img" alt="Your dog">
+                    <button class="btn-remove" id="btn-remove">✕</button>
                 </div>
 
-                <div class="evidence-panel">
-                    <img id="evidence-img" alt="Crime scene">
-                    <div class="evidence-tag">EXHIBIT A</div>
+                <button class="btn-analyze hidden" id="btn-analyze">
+                    <span class="btn-icon">✨</span>
+                    <span id="btn-analyze-text">Analyze</span>
+                </button>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section hidden" id="results-section">
+                <!-- Urgency Banner (for emergency/health) -->
+                <div class="urgency-banner hidden" id="urgency-banner">
+                    <span class="urgency-icon" id="urgency-icon">🟢</span>
+                    <span class="urgency-text" id="urgency-text">Everything looks normal</span>
                 </div>
 
-                <div class="audio-player">
+                <!-- Voice Player -->
+                <div class="voice-player hidden" id="voice-player">
                     <button class="btn-play" id="btn-play">▶</button>
-                    <div class="waveform" id="waveform">
-                        <div class="progress-bar" id="progress-bar"></div>
+                    <div class="voice-bar">
+                        <div class="voice-progress" id="voice-progress"></div>
                     </div>
-                    <span class="time" id="time-display">0:00 / 0:00</span>
+                    <span class="voice-label">AI Voice Summary</span>
                 </div>
 
-                <div class="transcript" id="transcript">
-                    <!-- Transcript lines will be inserted here -->
+                <!-- Report Content -->
+                <div class="report" id="report">
+                    <!-- Dynamically populated -->
                 </div>
 
-                <div class="verdict-panel hidden" id="verdict-panel">
-                    <div class="verdict-stamp" id="verdict-stamp">NOT GUILTY</div>
-                    <p class="verdict-reason" id="verdict-reason">by reason of extreme cuteness</p>
+                <!-- Dog Court Results (special) -->
+                <div class="court-results hidden" id="court-results">
+                    <div class="court-header">
+                        <h3 id="court-case-title">The People vs. Max</h3>
+                        <p class="court-charge" id="court-charge">Charge: Grand Theft Sandwich</p>
+                    </div>
+                    <div class="court-audio">
+                        <button class="btn-play-court" id="btn-play-court">▶ Play Trial</button>
+                    </div>
+                    <div class="court-transcript" id="court-transcript"></div>
+                    <div class="court-verdict" id="court-verdict">
+                        <span class="verdict-text">NOT GUILTY</span>
+                        <span class="verdict-reason">by reason of extreme cuteness</span>
+                    </div>
                 </div>
 
-                <div class="trial-actions">
-                    <button class="btn-secondary" id="btn-new-trial">📸 New Trial</button>
-                    <button class="btn-primary" id="btn-share">🔗 Share Verdict</button>
+                <!-- Actions -->
+                <div class="result-actions">
+                    <button class="btn-secondary" id="btn-new">← New Check</button>
+                    <button class="btn-secondary" id="btn-share">Share 🔗</button>
+                </div>
+            </section>
+
+            <!-- Loading -->
+            <section class="loading-section hidden" id="loading-section">
+                <div class="loader"></div>
+                <p class="loading-text" id="loading-text">Analyzing your dog...</p>
+                <p class="loading-sub" id="loading-sub">This usually takes 5-10 seconds</p>
+            </section>
+        </main>
+
+        <!-- API Keys Modal -->
+        <div class="modal hidden" id="keys-modal">
+            <div class="modal-content">
+                <h3>🔑 API Keys</h3>
+                <p class="modal-desc">Free keys — your data stays in your browser.</p>
+                <div class="field">
+                    <label>Google AI (Gemini)</label>
+                    <input type="password" id="gemini-key" placeholder="AIza...">
+                    <a href="https://aistudio.google.com/apikey" target="_blank">Get free key →</a>
+                </div>
+                <div class="field">
+                    <label>ElevenLabs (optional — for voice)</label>
+                    <input type="password" id="elevenlabs-key" placeholder="sk_...">
+                    <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank">Get free key →</a>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-primary" id="btn-save-keys">Save</button>
+                    <button class="btn-secondary" id="btn-close-modal">Cancel</button>
                 </div>
             </div>
-        </section>
-    </div>
+        </div>
 
-    <footer>
-        <p>Built for <a href="https://dev.to/challenges/weekend-2026-08-13">DEV Weekend Challenge: Dog Days Edition</a> by <a href="https://dev.to/simplynadaf">Sarvar Nadaf</a></p>
-        <p class="tech-badges">
-            <span class="badge google">Google AI</span>
-            <span class="badge elevenlabs">ElevenLabs</span>
-        </p>
-    </footer>
+        <!-- Footer -->
+        <footer>
+            <p>Built for <a href="https://dev.to/challenges/weekend-2026-08-13">DEV Weekend Challenge: Dog Days Edition</a></p>
+            <p class="badges">
+                <span class="badge badge-google">Google AI</span>
+                <span class="badge badge-eleven">ElevenLabs</span>
+            </p>
+            <p class="disclaimer">⚠️ Not a substitute for veterinary care. When in doubt, see your vet.</p>
+        </footer>
+    </div>
 
     <script src="app.js"></script>
 </body>

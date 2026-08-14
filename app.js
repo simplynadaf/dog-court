@@ -1,25 +1,60 @@
 // ============================================================
-// DOG COURT — Main Application Logic
+// PawWise — AI Vet Friend
 // ============================================================
 
-const APP = {
+const STATE = {
+    mode: 'health', // health | behavior | emergency | court
     geminiKey: null,
     elevenLabsKey: null,
     imageFile: null,
     imageBase64: null,
-    trialData: null,
-    audioBlob: null,
     audioElement: null,
     isPlaying: false,
 };
 
-// Voice IDs for ElevenLabs (default library voices — valid until Dec 2026)
-// These are pre-made voices available on all accounts
+// Mode configurations
+const MODES = {
+    health: {
+        title: 'Health Check',
+        subtitle: 'Upload a photo of your dog. AI will assess body condition, coat health, posture, and flag anything to watch for.',
+        btnText: 'Check Health',
+        showUpload: true,
+        showText: false,
+        inputHint: '',
+    },
+    behavior: {
+        title: 'Behavior Decoder',
+        subtitle: 'Why is your dog doing that? Describe the behavior or upload a photo — get breed-specific explanations and advice.',
+        btnText: 'Explain Behavior',
+        showUpload: true,
+        showText: true,
+        inputHint: 'E.g., "My 2-year-old lab barks at every person who walks past the window"',
+    },
+    emergency: {
+        title: 'Emergency Triage',
+        subtitle: 'Worried something is wrong? Describe the situation for an urgency assessment and first-aid guidance.',
+        btnText: '🚨 Assess Urgency',
+        showUpload: true,
+        showText: true,
+        inputHint: 'E.g., "My dog ate a piece of dark chocolate 30 minutes ago" or "Limping on back left leg since yesterday"',
+    },
+    court: {
+        title: 'Dog Court 🏛️',
+        subtitle: 'Your dog committed a crime? Upload the evidence. AI generates a full courtroom drama with voice-acted trial.',
+        btnText: '⚖️ File Charges',
+        showUpload: true,
+        showText: false,
+        inputHint: '',
+    },
+};
+
+// ElevenLabs voices
 const VOICES = {
-    judge: 'pNInz6obpgDQGcFmaJgB', // Adam - deep, authoritative male
-    defense: 'ErXwobaYiN019PkySvjV', // Antoni - energetic, expressive male
-    prosecution: 'EXAVITQu4vr4xnSDxMaL', // Sarah - emotional female
-    defendant: 'IKne3meq5aSn9XLyUdCD', // Charlie - young, innocent male
+    narrator: 'pNInz6obpgDQGcFmaJgB',   // Adam - calm narrator for health/emergency
+    judge: 'pNInz6obpgDQGcFmaJgB',       // Adam - deep authoritative
+    defense: 'ErXwobaYiN019PkySvjV',      // Antoni - energetic
+    prosecution: 'EXAVITQu4vr4xnSDxMaL',  // Sarah - emotional
+    defendant: 'IKne3meq5aSn9XLyUdCD',    // Charlie - innocent
 };
 
 // ============================================================
@@ -27,552 +62,636 @@ const VOICES = {
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadSavedKeys();
-    setupEventListeners();
+    loadKeys();
+    setupModes();
+    setupUpload();
+    setupButtons();
 });
 
-function loadSavedKeys() {
-    APP.geminiKey = localStorage.getItem('dogcourt_gemini_key') || '';
-    APP.elevenLabsKey = localStorage.getItem('dogcourt_elevenlabs_key') || '';
-
-    const geminiInput = document.getElementById('gemini-key');
-    const elevenInput = document.getElementById('elevenlabs-key');
-
-    if (APP.geminiKey) geminiInput.value = APP.geminiKey;
-    if (APP.elevenLabsKey) elevenInput.value = APP.elevenLabsKey;
-}
-
-function setupEventListeners() {
-    // Upload zone
-    const uploadZone = document.getElementById('upload-zone');
-    const fileInput = document.getElementById('file-input');
-    const btnBrowse = document.getElementById('btn-browse');
-
-    uploadZone.addEventListener('click', () => fileInput.click());
-    btnBrowse.addEventListener('click', (e) => {
-        e.stopPropagation();
-        fileInput.click();
-    });
-
-    uploadZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadZone.classList.add('dragover');
-    });
-
-    uploadZone.addEventListener('dragleave', () => {
-        uploadZone.classList.remove('dragover');
-    });
-
-    uploadZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadZone.classList.remove('dragover');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-            handleImageSelected(file);
-        }
-    });
-
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files[0]) {
-            handleImageSelected(e.target.files[0]);
-        }
-    });
-
-    // File charges button
-    document.getElementById('btn-file-charges').addEventListener('click', startTrial);
-
-    // Save keys
-    document.getElementById('btn-save-keys').addEventListener('click', saveKeys);
-
-    // Audio controls
-    document.getElementById('btn-play').addEventListener('click', togglePlayback);
-
-    // New trial
-    document.getElementById('btn-new-trial').addEventListener('click', resetToUpload);
-
-    // Share
-    document.getElementById('btn-share').addEventListener('click', shareVerdict);
-
-    // Waveform seek
-    document.getElementById('waveform').addEventListener('click', seekAudio);
+function loadKeys() {
+    STATE.geminiKey = localStorage.getItem('pawwise_gemini') || '';
+    STATE.elevenLabsKey = localStorage.getItem('pawwise_eleven') || '';
+    if (STATE.geminiKey) document.getElementById('gemini-key').value = STATE.geminiKey;
+    if (STATE.elevenLabsKey) document.getElementById('elevenlabs-key').value = STATE.elevenLabsKey;
 }
 
 // ============================================================
-// IMAGE HANDLING
+// MODE SWITCHING
 // ============================================================
 
-function handleImageSelected(file) {
-    APP.imageFile = file;
+function setupModes() {
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const mode = btn.dataset.mode;
+            switchMode(mode);
+        });
+    });
+}
+
+function switchMode(mode) {
+    STATE.mode = mode;
+    const config = MODES[mode];
+
+    // Update active button
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+
+    // Update description
+    document.getElementById('mode-title').textContent = config.title;
+    document.getElementById('mode-subtitle').textContent = config.subtitle;
+    document.getElementById('btn-analyze-text').textContent = config.btnText;
+
+    // Show/hide text input
+    const textSection = document.getElementById('text-input-section');
+    if (config.showText) {
+        textSection.classList.remove('hidden');
+        document.getElementById('input-hint').textContent = config.inputHint;
+    } else {
+        textSection.classList.add('hidden');
+    }
+
+    // Reset view
+    showSection('upload-section');
+}
+
+// ============================================================
+// FILE UPLOAD
+// ============================================================
+
+function setupUpload() {
+    const zone = document.getElementById('upload-zone');
+    const input = document.getElementById('file-input');
+
+    zone.addEventListener('click', () => input.click());
+
+    zone.addEventListener('dragover', e => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+    });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+
+    input.addEventListener('change', e => {
+        if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    document.getElementById('btn-remove').addEventListener('click', removeImage);
+}
+
+function handleFile(file) {
+    if (!file.type.startsWith('image/')) return;
+    STATE.imageFile = file;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
-        APP.imageBase64 = e.target.result.split(',')[1]; // Remove data:image/...;base64, prefix
-        const previewImg = document.getElementById('preview-img');
-        previewImg.src = e.target.result;
-
+    reader.onload = e => {
+        STATE.imageBase64 = e.target.result.split(',')[1];
+        document.getElementById('preview-img').src = e.target.result;
+        document.getElementById('preview').classList.remove('hidden');
         document.getElementById('upload-zone').classList.add('hidden');
-        document.getElementById('preview-area').classList.remove('hidden');
+        document.getElementById('btn-analyze').classList.remove('hidden');
     };
     reader.readAsDataURL(file);
 }
 
+function removeImage() {
+    STATE.imageFile = null;
+    STATE.imageBase64 = null;
+    document.getElementById('preview').classList.add('hidden');
+    document.getElementById('upload-zone').classList.remove('hidden');
+    document.getElementById('btn-analyze').classList.add('hidden');
+    document.getElementById('file-input').value = '';
+}
+
 // ============================================================
-// API KEY MANAGEMENT
+// BUTTONS & NAVIGATION
 // ============================================================
+
+function setupButtons() {
+    document.getElementById('btn-analyze').addEventListener('click', analyze);
+    document.getElementById('btn-new').addEventListener('click', resetToStart);
+    document.getElementById('btn-share').addEventListener('click', share);
+    document.getElementById('btn-keys').addEventListener('click', () => toggleModal(true));
+    document.getElementById('btn-close-modal').addEventListener('click', () => toggleModal(false));
+    document.getElementById('btn-save-keys').addEventListener('click', saveKeys);
+    document.getElementById('btn-play').addEventListener('click', toggleAudio);
+}
+
+function toggleModal(show) {
+    document.getElementById('keys-modal').classList.toggle('hidden', !show);
+}
 
 function saveKeys() {
-    const geminiKey = document.getElementById('gemini-key').value.trim();
-    const elevenKey = document.getElementById('elevenlabs-key').value.trim();
+    const g = document.getElementById('gemini-key').value.trim();
+    const e = document.getElementById('elevenlabs-key').value.trim();
+    if (g) { STATE.geminiKey = g; localStorage.setItem('pawwise_gemini', g); }
+    if (e) { STATE.elevenLabsKey = e; localStorage.setItem('pawwise_eleven', e); }
+    toggleModal(false);
+}
 
-    if (geminiKey) {
-        APP.geminiKey = geminiKey;
-        localStorage.setItem('dogcourt_gemini_key', geminiKey);
-    }
-    if (elevenKey) {
-        APP.elevenLabsKey = elevenKey;
-        localStorage.setItem('dogcourt_elevenlabs_key', elevenKey);
-    }
+function resetToStart() {
+    removeImage();
+    document.getElementById('situation-input').value = '';
+    showSection('upload-section');
+    document.getElementById('results-section').classList.add('hidden');
+}
 
-    alert('Keys saved! They are stored locally in your browser.');
+function showSection(id) {
+    ['upload-section', 'loading-section', 'results-section'].forEach(s => {
+        document.getElementById(s).classList.toggle('hidden', s !== id);
+    });
 }
 
 // ============================================================
-// TRIAL FLOW
+// MAIN ANALYSIS FLOW
 // ============================================================
 
-async function startTrial() {
-    // Validate keys
-    APP.geminiKey = document.getElementById('gemini-key').value.trim() || APP.geminiKey;
-    APP.elevenLabsKey = document.getElementById('elevenlabs-key').value.trim() || APP.elevenLabsKey;
-
-    if (!APP.geminiKey || !APP.elevenLabsKey) {
-        alert('Please enter both API keys first (expand the API Keys section below the upload area).');
+async function analyze() {
+    STATE.geminiKey = document.getElementById('gemini-key').value.trim() || STATE.geminiKey;
+    if (!STATE.geminiKey) {
+        toggleModal(true);
         return;
     }
 
-    if (!APP.imageBase64) {
-        alert('Please upload a crime scene photo first.');
+    if (!STATE.imageBase64 && !document.getElementById('situation-input').value.trim()) {
+        alert('Please upload a photo or describe the situation.');
         return;
     }
 
-    // Switch to processing screen
-    showScreen('screen-processing');
+    showSection('loading-section');
+    setLoading('Analyzing your dog...', 'This usually takes 5-10 seconds');
 
     try {
-        // Step 1: Analyze crime scene with Gemini
-        setStep('step-analyze', 'active');
-        updateStatus('Analyzing the crime scene...');
-        const crimeAnalysis = await analyzeCrimeScene();
-
-        setStep('step-analyze', 'done');
-
-        // Step 2: Generate courtroom script
-        setStep('step-script', 'active');
-        updateStatus('Writing the courtroom script...');
-        const script = await generateScript(crimeAnalysis);
-        APP.trialData = script;
-
-        setStep('step-script', 'done');
-
-        // Step 3: Generate voice audio via Text-to-Dialogue
-        setStep('step-voices', 'active');
-        updateStatus('Voice-acting the trial...');
-        const audioBlob = await generateDialogueAudio(script);
-        APP.audioBlob = audioBlob;
-
-        setStep('step-voices', 'done');
-
-        // Step 4: Done (sound effects are optional/enhancement)
-        setStep('step-sfx', 'active');
-        updateStatus('Preparing the courtroom...');
-        await new Promise(r => setTimeout(r, 1000));
-        setStep('step-sfx', 'done');
-
-        // Show trial screen
-        displayTrial();
-
-    } catch (error) {
-        console.error('Trial failed:', error);
-        alert(`Trial failed: ${error.message}\n\nPlease check your API keys and try again.`);
-        showScreen('screen-upload');
+        if (STATE.mode === 'court') {
+            await runCourtMode();
+        } else {
+            await runHealthMode();
+        }
+    } catch (err) {
+        console.error(err);
+        alert(`Error: ${err.message}\n\nCheck your API key and try again.`);
+        showSection('upload-section');
     }
 }
 
 // ============================================================
-// GEMINI API — Crime Scene Analysis
+// HEALTH / BEHAVIOR / EMERGENCY MODE
 // ============================================================
 
-async function analyzeCrimeScene() {
-    const prompt = `You are a forensic investigator for DOG COURT. Analyze this image of a dog's "crime scene."
+async function runHealthMode() {
+    const dogInfo = getDogProfile();
+    const situation = document.getElementById('situation-input')?.value.trim() || '';
+    const prompt = buildPrompt(STATE.mode, dogInfo, situation);
 
-Identify:
-1. What the dog did (the "crime" - e.g., chewed shoe, destroyed pillow, stole food)
-2. The evidence visible in the photo
-3. The dog's breed (best guess) and name suggestion
-4. The estimated "damage" in a humorous way
+    setLoading('AI is examining the photo...', 'Looking at body condition, posture, coat, eyes...');
 
-Respond in JSON format:
-{
-    "crime": "brief description of what the dog did",
-    "evidence": ["list", "of", "visible", "evidence"],
-    "dog_breed": "best guess breed",
-    "dog_name": "a funny name for the defendant",
-    "damage_description": "humorous damage assessment",
-    "severity": "misdemeanor" or "felony" (for comedy)
-}
+    const result = await callGemini(prompt, STATE.imageBase64 ? true : false);
 
-Be funny and dramatic. This is for a comedy courtroom drama.`;
-
-    const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${APP.geminiKey}`,
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [
-                        { text: prompt },
-                        {
-                            inline_data: {
-                                mime_type: APP.imageFile.type,
-                                data: APP.imageBase64
-                            }
-                        }
-                    ]
-                }],
-                generationConfig: {
-                    temperature: 0.9,
-                    responseMimeType: 'application/json'
-                }
-            })
-        }
-    );
-
-    if (!response.ok) {
-        const err = await response.json();
-        throw new Error(`Gemini API error: ${err.error?.message || response.statusText}`);
+    // Generate voice (if ElevenLabs key available)
+    let audioBlob = null;
+    if (STATE.elevenLabsKey && result.voice_summary) {
+        setLoading('Generating voice summary...', 'Almost done');
+        audioBlob = await generateVoice(result.voice_summary);
     }
 
-    const data = await response.json();
-    const text = data.candidates[0].content.parts[0].text;
-    return JSON.parse(text);
+    displayResults(result, audioBlob);
 }
 
-// ============================================================
-// GEMINI API — Script Generation
-// ============================================================
+function buildPrompt(mode, dogInfo, situation) {
+    const dogContext = dogInfo.breed || dogInfo.age || dogInfo.weight || dogInfo.name
+        ? `\nDog details: ${dogInfo.name ? 'Name: ' + dogInfo.name + '. ' : ''}${dogInfo.breed ? 'Breed: ' + dogInfo.breed + '. ' : ''}${dogInfo.age ? 'Age: ' + dogInfo.age + '. ' : ''}${dogInfo.weight ? 'Weight: ' + dogInfo.weight + '.' : ''}`
+        : '';
 
-async function generateScript(crimeAnalysis) {
-    const prompt = `You are a comedy writer for DOG COURT, a hilarious courtroom drama where dogs are put on trial for their "crimes."
+    const situationContext = situation ? `\nOwner's description: "${situation}"` : '';
 
-Based on this crime analysis:
-${JSON.stringify(crimeAnalysis, null, 2)}
+    if (mode === 'health') {
+        return `You are PawWise, a friendly AI veterinary advisor. Analyze this photo of a dog.${dogContext}${situationContext}
 
-Write a courtroom script with exactly these characters:
-- JUDGE (stern, dry humor, world-weary)
-- DEFENSE (the dog's lawyer - theatrical, uses absurd legal arguments)
-- PROSECUTION (the human owner - exasperated, emotional about their destroyed item)
-- DEFENDANT (the dog - confused but endearing, speaks in simple sentences)
-
-The script should be:
-- 6-10 dialogue lines total (keep it punchy, under 1800 characters total for all dialogue)
-- Genuinely funny with unexpected legal arguments
-- End with a verdict (90% of the time: NOT GUILTY with a ridiculous reason)
-- Include stage directions in square brackets for tone
-
-Respond in JSON format:
+Provide a comprehensive health assessment in this JSON format:
 {
-    "case_number": "random 3-digit number",
-    "case_title": "The People vs. [Dog Name]",
-    "charge": "formal-sounding charge (humorous)",
-    "dialogue": [
-        {
-            "speaker": "judge" | "defense" | "prosecution" | "defendant",
-            "emotion": "emotion/direction tag",
-            "line": "the spoken dialogue"
-        }
+    "urgency": "green" | "yellow" | "orange" | "red",
+    "urgency_label": "one-line summary of overall status",
+    "body_condition": {
+        "score": "estimated BCS on 1-9 scale (5 is ideal)",
+        "assessment": "underweight/ideal/overweight/obese",
+        "details": "what you observe about weight"
+    },
+    "observations": [
+        {"area": "Coat", "status": "good/concern/unknown", "note": "what you see"},
+        {"area": "Eyes", "status": "good/concern/unknown", "note": "what you see"},
+        {"area": "Posture", "status": "good/concern/unknown", "note": "what you see"},
+        {"area": "Energy", "status": "good/concern/unknown", "note": "any visible indicators"}
     ],
-    "verdict": "NOT GUILTY" or "GUILTY",
-    "verdict_reason": "humorous one-line reason for verdict"
+    "breed_risks": ["list of health conditions common in this breed to watch for"],
+    "action_items": ["specific things the owner should do or watch for"],
+    "voice_summary": "A warm, conversational 2-3 sentence summary to be spoken aloud. Start with 'Hey there!' Be reassuring but honest."
 }
 
-IMPORTANT: Keep each line under 250 characters. Total dialogue under 1800 characters. Be genuinely funny!`;
+Be specific about what you SEE. If you can't assess something from the photo, say so honestly. Always remind that this is not a substitute for vet care.`;
+    }
 
-    const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${APP.geminiKey}`,
+    if (mode === 'behavior') {
+        return `You are PawWise, a friendly dog behavior expert. A dog owner needs help understanding their dog's behavior.${dogContext}${situationContext}
+
+${STATE.imageBase64 ? 'Analyze the photo for behavioral context.' : ''}
+
+Provide a behavioral assessment in this JSON format:
+{
+    "urgency": "green" | "yellow" | "orange" | "red",
+    "urgency_label": "one-line summary",
+    "behavior_explanation": "Why the dog is likely doing this (2-3 sentences, plain language)",
+    "is_normal": true/false,
+    "breed_context": "How this behavior relates to the breed's instincts/needs",
+    "possible_causes": ["list of likely causes ranked by probability"],
+    "what_to_do": ["specific, actionable training/management steps"],
+    "when_to_worry": "describe when this behavior becomes concerning enough for a vet/behaviorist",
+    "voice_summary": "Warm 2-3 sentence spoken summary. Validate the owner's concern, explain simply, give one tip."
+}
+
+Be practical and specific. No jargon. Explain WHY the dog does this, not just what to do.`;
+    }
+
+    if (mode === 'emergency') {
+        return `You are PawWise Emergency Triage. A dog owner is worried about their dog.${dogContext}${situationContext}
+
+${STATE.imageBase64 ? 'Analyze the photo for clinical signs.' : ''}
+
+Provide emergency triage in this JSON format:
+{
+    "urgency": "green" | "yellow" | "orange" | "red",
+    "urgency_label": "Clear one-line verdict (e.g., 'This is not an emergency, but see your vet this week')",
+    "assessment": "2-3 sentence explanation of what's likely happening",
+    "immediate_actions": ["what to do RIGHT NOW, step by step"],
+    "watch_for": ["signs that indicate it's getting WORSE and they should go to emergency vet"],
+    "vet_questions": ["questions the vet will ask — prepare these answers"],
+    "timeframe": "how urgently they need to act (e.g., 'within 2 hours' or 'schedule within a week')",
+    "voice_summary": "Calm, reassuring 2-3 sentence spoken summary. Be clear about urgency without causing panic."
+}
+
+CRITICAL: Err on the side of caution for anything potentially life-threatening (GDV/bloat, toxin ingestion, seizures, breathing difficulty). Better to say "go to vet" than miss something serious.
+Always include: "If you're ever unsure, calling your vet is always the right choice."`;
+    }
+}
+
+function getDogProfile() {
+    return {
+        breed: document.getElementById('dog-breed')?.value.trim() || '',
+        age: document.getElementById('dog-age')?.value.trim() || '',
+        weight: document.getElementById('dog-weight')?.value.trim() || '',
+        name: document.getElementById('dog-name')?.value.trim() || '',
+    };
+}
+
+// ============================================================
+// DOG COURT MODE
+// ============================================================
+
+async function runCourtMode() {
+    setLoading('Analyzing the crime scene...', 'Gathering evidence');
+
+    // Step 1: Analyze crime
+    const analysisPrompt = `You are a forensic investigator for DOG COURT. Analyze this image of a dog's "crime scene."
+Identify what the dog did, the evidence, the breed, and suggest a funny defendant name.
+Respond in JSON: {"crime": "...", "evidence": ["..."], "dog_breed": "...", "dog_name": "...", "severity": "misdemeanor|felony"}
+Be funny and dramatic.`;
+
+    const analysis = await callGemini(analysisPrompt, true);
+
+    // Step 2: Generate script
+    setLoading('Writing courtroom script...', 'Assembling legal team');
+
+    const scriptPrompt = `You write comedy for DOG COURT. Based on this crime: ${JSON.stringify(analysis)}
+Write a courtroom script. Characters: JUDGE (dry humor), DEFENSE (theatrical, absurd legal arguments), PROSECUTION (exasperated human), DEFENDANT (confused dog).
+JSON format:
+{
+    "case_title": "The People vs. [Name]",
+    "charge": "formal humorous charge",
+    "dialogue": [{"speaker": "judge|defense|prosecution|defendant", "emotion": "tag", "line": "text under 200 chars"}],
+    "verdict": "NOT GUILTY",
+    "verdict_reason": "humorous reason"
+}
+6-8 lines total. Under 1800 chars total for all dialogue. Be genuinely funny!`;
+
+    const script = await callGemini(scriptPrompt, false);
+
+    // Step 3: Generate audio (if ElevenLabs key)
+    let audioBlob = null;
+    if (STATE.elevenLabsKey && script.dialogue) {
+        setLoading('Voice-acting the trial...', 'Multiple characters speaking');
+        const inputs = script.dialogue.map(line => ({
+            text: line.emotion ? `[${line.emotion}] ${line.line}` : line.line,
+            voice_id: VOICES[line.speaker] || VOICES.judge
+        }));
+
+        try {
+            audioBlob = await callElevenLabsDialogue(inputs);
+        } catch (e) {
+            console.warn('Audio generation failed, showing text only:', e);
+        }
+    }
+
+    displayCourtResults(script, audioBlob);
+}
+
+// ============================================================
+// API CALLS
+// ============================================================
+
+async function callGemini(prompt, includeImage) {
+    const parts = [{ text: prompt }];
+
+    if (includeImage && STATE.imageBase64) {
+        parts.push({
+            inline_data: {
+                mime_type: STATE.imageFile?.type || 'image/jpeg',
+                data: STATE.imageBase64
+            }
+        });
+    }
+
+    const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${STATE.geminiKey}`,
         {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: prompt }]
-                }],
-                generationConfig: {
-                    temperature: 1.0,
-                    responseMimeType: 'application/json'
-                }
+                contents: [{ parts }],
+                generationConfig: { temperature: 0.8, responseMimeType: 'application/json' }
             })
         }
     );
 
-    if (!response.ok) {
-        const err = await response.json();
-        throw new Error(`Gemini script error: ${err.error?.message || response.statusText}`);
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `Gemini API error (${res.status})`);
     }
 
-    const data = await response.json();
-    const text = data.candidates[0].content.parts[0].text;
+    const data = await res.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error('Empty response from Gemini');
     return JSON.parse(text);
 }
 
-// ============================================================
-// ELEVENLABS API — Text-to-Dialogue
-// ============================================================
-
-async function generateDialogueAudio(script) {
-    // Build the inputs array for Text-to-Dialogue API
-    const inputs = script.dialogue.map(line => {
-        const voiceId = VOICES[line.speaker] || VOICES.judge;
-        const emotionTag = line.emotion ? `[${line.emotion}] ` : '';
-        return {
-            text: `${emotionTag}${line.line}`,
-            voice_id: voiceId
-        };
-    });
-
-    const response = await fetch('https://api.elevenlabs.io/v1/text-to-dialogue', {
+async function generateVoice(text) {
+    const res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + VOICES.narrator, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'xi-api-key': APP.elevenLabsKey
+            'xi-api-key': STATE.elevenLabsKey,
+        },
+        body: JSON.stringify({
+            text: text,
+            model_id: 'eleven_multilingual_v2',
+        })
+    });
+
+    if (!res.ok) throw new Error('ElevenLabs TTS failed');
+    return await res.blob();
+}
+
+async function callElevenLabsDialogue(inputs) {
+    const res = await fetch('https://api.elevenlabs.io/v1/text-to-dialogue', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'xi-api-key': STATE.elevenLabsKey,
         },
         body: JSON.stringify({ inputs })
     });
 
-    if (!response.ok) {
-        const errText = await response.text();
-        let errMsg = response.statusText;
-        try {
-            const errJson = JSON.parse(errText);
-            errMsg = errJson.detail?.message || errJson.detail || errMsg;
-        } catch (e) { /* ignore */ }
-        throw new Error(`ElevenLabs error: ${errMsg}`);
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`ElevenLabs dialogue failed: ${err}`);
     }
-
-    return await response.blob();
+    return await res.blob();
 }
 
 // ============================================================
-// DISPLAY TRIAL
+// DISPLAY RESULTS
 // ============================================================
 
-function displayTrial() {
-    const trial = APP.trialData;
+function displayResults(result, audioBlob) {
+    // Urgency banner
+    const banner = document.getElementById('urgency-banner');
+    const urgencyIcons = { green: '🟢', yellow: '🟡', orange: '🟠', red: '🔴' };
+    banner.className = `urgency-banner ${result.urgency}`;
+    banner.classList.remove('hidden');
+    document.getElementById('urgency-icon').textContent = urgencyIcons[result.urgency] || '🟢';
+    document.getElementById('urgency-text').textContent = result.urgency_label || 'Assessment complete';
 
-    // Set case info
-    document.getElementById('case-number').textContent = `Case #${trial.case_number}`;
-    document.getElementById('case-title').textContent = trial.case_title;
-    document.getElementById('case-charge').textContent = `Charge: ${trial.charge}`;
-
-    // Set evidence image
-    document.getElementById('evidence-img').src = document.getElementById('preview-img').src;
-
-    // Build transcript
-    const transcriptEl = document.getElementById('transcript');
-    transcriptEl.innerHTML = '';
-
-    const speakerIcons = {
-        judge: '🧑‍⚖️',
-        defense: '🦮',
-        prosecution: '👤',
-        defendant: '🐕'
-    };
-
-    const speakerNames = {
-        judge: 'Judge Barksworth',
-        defense: 'Defense Attorney Rex',
-        prosecution: 'The Prosecution',
-        defendant: 'The Defendant'
-    };
-
-    trial.dialogue.forEach((line, i) => {
-        const div = document.createElement('div');
-        div.className = 'transcript-line';
-        div.dataset.index = i;
-        div.innerHTML = `
-            <span class="speaker-icon">${speakerIcons[line.speaker] || '👤'}</span>
-            <div class="line-content">
-                <div class="speaker-name">${speakerNames[line.speaker] || line.speaker}</div>
-                <div class="speaker-text">${line.line}</div>
-            </div>
-        `;
-        transcriptEl.appendChild(div);
-    });
-
-    // Set verdict
-    const verdictStamp = document.getElementById('verdict-stamp');
-    verdictStamp.textContent = trial.verdict;
-    verdictStamp.className = 'verdict-stamp' + (trial.verdict === 'GUILTY' ? ' guilty' : '');
-    document.getElementById('verdict-reason').textContent = trial.verdict_reason;
-
-    // Setup audio
-    if (APP.audioBlob) {
-        const audioUrl = URL.createObjectURL(APP.audioBlob);
-        APP.audioElement = new Audio(audioUrl);
-        APP.audioElement.addEventListener('timeupdate', updateAudioProgress);
-        APP.audioElement.addEventListener('ended', onAudioEnded);
-        APP.audioElement.addEventListener('loadedmetadata', () => {
-            updateTimeDisplay();
-        });
+    // Voice player
+    if (audioBlob) {
+        setupAudio(audioBlob);
+        document.getElementById('voice-player').classList.remove('hidden');
+    } else {
+        document.getElementById('voice-player').classList.add('hidden');
     }
 
-    // Show trial screen
-    showScreen('screen-trial');
+    // Build report HTML
+    const report = document.getElementById('report');
+    report.innerHTML = buildReportHTML(result);
+
+    // Hide court section
+    document.getElementById('court-results').classList.add('hidden');
+    report.classList.remove('hidden');
+
+    showSection('results-section');
+}
+
+function buildReportHTML(result) {
+    let html = '';
+
+    // Body condition (health mode)
+    if (result.body_condition) {
+        html += `<div class="report-section">
+            <h4>Body Condition</h4>
+            <p><strong>Score: ${result.body_condition.score}/9</strong> (${result.body_condition.assessment})</p>
+            <p>${result.body_condition.details}</p>
+        </div>`;
+    }
+
+    // Observations
+    if (result.observations) {
+        html += `<div class="report-section"><h4>Observations</h4><ul>`;
+        result.observations.forEach(obs => {
+            const statusIcon = obs.status === 'good' ? '✅' : obs.status === 'concern' ? '⚠️' : '❓';
+            html += `<li>${statusIcon} <strong>${obs.area}:</strong> ${obs.note}</li>`;
+        });
+        html += `</ul></div>`;
+    }
+
+    // Behavior explanation
+    if (result.behavior_explanation) {
+        html += `<div class="report-section">
+            <h4>What's Happening</h4>
+            <p>${result.behavior_explanation}</p>
+        </div>`;
+    }
+
+    // Assessment (emergency)
+    if (result.assessment && STATE.mode === 'emergency') {
+        html += `<div class="report-section">
+            <h4>Assessment</h4>
+            <p>${result.assessment}</p>
+        </div>`;
+    }
+
+    // Immediate actions
+    if (result.immediate_actions) {
+        html += `<div class="report-section"><h4>Do This Now</h4><ul>`;
+        result.immediate_actions.forEach(a => { html += `<li>${a}</li>`; });
+        html += `</ul></div>`;
+    }
+
+    // What to do
+    if (result.what_to_do) {
+        html += `<div class="report-section"><h4>What To Do</h4><ul>`;
+        result.what_to_do.forEach(a => { html += `<li>${a}</li>`; });
+        html += `</ul></div>`;
+    }
+
+    // Possible causes
+    if (result.possible_causes) {
+        html += `<div class="report-section"><h4>Possible Causes</h4><ul>`;
+        result.possible_causes.forEach(c => { html += `<li>${c}</li>`; });
+        html += `</ul></div>`;
+    }
+
+    // Breed risks
+    if (result.breed_risks && result.breed_risks.length > 0) {
+        html += `<div class="report-section"><h4>Breed-Specific Risks to Watch</h4><ul>`;
+        result.breed_risks.forEach(r => { html += `<li>${r}</li>`; });
+        html += `</ul></div>`;
+    }
+
+    // Watch for (emergency)
+    if (result.watch_for) {
+        html += `<div class="report-section"><h4>⚠️ Go to Emergency Vet If...</h4><ul>`;
+        result.watch_for.forEach(w => { html += `<li>${w}</li>`; });
+        html += `</ul></div>`;
+    }
+
+    // Action items
+    if (result.action_items) {
+        html += `<div class="report-section"><h4>Action Items</h4><ul>`;
+        result.action_items.forEach(a => { html += `<li>${a}</li>`; });
+        html += `</ul></div>`;
+    }
+
+    // Vet questions
+    if (result.vet_questions) {
+        html += `<div class="report-section"><h4>Questions Your Vet Will Ask</h4><ul>`;
+        result.vet_questions.forEach(q => { html += `<li>${q}</li>`; });
+        html += `</ul></div>`;
+    }
+
+    // Disclaimer
+    html += `<div class="report-section">
+        <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
+            ⚠️ PawWise is an AI tool, not a veterinarian. When in doubt, always consult your vet.
+        </p>
+    </div>`;
+
+    return html;
+}
+
+function displayCourtResults(script, audioBlob) {
+    // Hide regular report, show court
+    document.getElementById('report').classList.add('hidden');
+    document.getElementById('urgency-banner').classList.add('hidden');
+    document.getElementById('voice-player').classList.add('hidden');
+
+    const courtSection = document.getElementById('court-results');
+    courtSection.classList.remove('hidden');
+
+    document.getElementById('court-case-title').textContent = script.case_title || 'The People vs. Dog';
+    document.getElementById('court-charge').textContent = `Charge: ${script.charge || 'Being too cute'}`;
+
+    // Transcript
+    const transcript = document.getElementById('court-transcript');
+    const icons = { judge: '🧑‍⚖️', defense: '🦮', prosecution: '👤', defendant: '🐕' };
+    const names = { judge: 'Judge', defense: 'Defense', prosecution: 'Prosecution', defendant: 'Defendant' };
+
+    transcript.innerHTML = script.dialogue.map(line => `
+        <div class="court-line">
+            <span class="speaker">${icons[line.speaker] || '👤'} ${names[line.speaker] || line.speaker}</span>
+            <span class="dialog">${line.line}</span>
+        </div>
+    `).join('');
+
+    // Verdict
+    const verdictEl = document.getElementById('court-verdict');
+    verdictEl.className = 'court-verdict' + (script.verdict === 'GUILTY' ? ' guilty' : '');
+    verdictEl.innerHTML = `
+        <span class="verdict-text">${script.verdict}</span>
+        <span class="verdict-reason">${script.verdict_reason}</span>
+    `;
+
+    // Audio
+    const playBtn = document.getElementById('btn-play-court');
+    if (audioBlob) {
+        const url = URL.createObjectURL(audioBlob);
+        const audio = new Audio(url);
+        playBtn.onclick = () => {
+            if (audio.paused) { audio.play(); playBtn.textContent = '⏸ Playing...'; }
+            else { audio.pause(); playBtn.textContent = '▶ Play Trial'; }
+        };
+        audio.onended = () => { playBtn.textContent = '▶ Play Again'; };
+        playBtn.classList.remove('hidden');
+    } else {
+        playBtn.classList.add('hidden');
+    }
+
+    showSection('results-section');
 }
 
 // ============================================================
 // AUDIO PLAYBACK
 // ============================================================
 
-function togglePlayback() {
-    if (!APP.audioElement) return;
+function setupAudio(blob) {
+    if (STATE.audioElement) { STATE.audioElement.pause(); }
+    const url = URL.createObjectURL(blob);
+    STATE.audioElement = new Audio(url);
+    STATE.audioElement.addEventListener('timeupdate', () => {
+        const pct = (STATE.audioElement.currentTime / STATE.audioElement.duration) * 100;
+        document.getElementById('voice-progress').style.width = pct + '%';
+    });
+    STATE.audioElement.addEventListener('ended', () => {
+        STATE.isPlaying = false;
+        document.getElementById('btn-play').textContent = '▶';
+    });
+}
 
-    const btn = document.getElementById('btn-play');
-
-    if (APP.isPlaying) {
-        APP.audioElement.pause();
-        btn.textContent = '▶';
-        APP.isPlaying = false;
+function toggleAudio() {
+    if (!STATE.audioElement) return;
+    if (STATE.isPlaying) {
+        STATE.audioElement.pause();
+        document.getElementById('btn-play').textContent = '▶';
     } else {
-        APP.audioElement.play();
-        btn.textContent = '⏸';
-        APP.isPlaying = true;
-
-        // Show verdict after audio plays
-        document.getElementById('verdict-panel').classList.remove('hidden');
+        STATE.audioElement.play();
+        document.getElementById('btn-play').textContent = '⏸';
     }
-}
-
-function updateAudioProgress() {
-    if (!APP.audioElement) return;
-
-    const progress = (APP.audioElement.currentTime / APP.audioElement.duration) * 100;
-    document.getElementById('progress-bar').style.width = `${progress}%`;
-    updateTimeDisplay();
-
-    // Highlight current transcript line (approximate)
-    highlightCurrentLine();
-}
-
-function updateTimeDisplay() {
-    if (!APP.audioElement) return;
-
-    const current = formatTime(APP.audioElement.currentTime);
-    const total = formatTime(APP.audioElement.duration || 0);
-    document.getElementById('time-display').textContent = `${current} / ${total}`;
-}
-
-function formatTime(seconds) {
-    if (isNaN(seconds)) return '0:00';
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
-function highlightCurrentLine() {
-    if (!APP.audioElement || !APP.trialData) return;
-
-    const lines = document.querySelectorAll('.transcript-line');
-    const totalLines = lines.length;
-    const progress = APP.audioElement.currentTime / APP.audioElement.duration;
-    const currentIndex = Math.min(Math.floor(progress * totalLines), totalLines - 1);
-
-    lines.forEach((line, i) => {
-        line.classList.remove('active');
-        if (i < currentIndex) {
-            line.classList.add('played');
-        } else if (i === currentIndex) {
-            line.classList.add('active', 'played');
-        }
-    });
-}
-
-function onAudioEnded() {
-    APP.isPlaying = false;
-    document.getElementById('btn-play').textContent = '▶';
-    document.getElementById('verdict-panel').classList.remove('hidden');
-
-    // Mark all lines as played
-    document.querySelectorAll('.transcript-line').forEach(l => {
-        l.classList.add('played');
-        l.classList.remove('active');
-    });
-}
-
-function seekAudio(e) {
-    if (!APP.audioElement) return;
-
-    const waveform = document.getElementById('waveform');
-    const rect = waveform.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    APP.audioElement.currentTime = percent * APP.audioElement.duration;
+    STATE.isPlaying = !STATE.isPlaying;
 }
 
 // ============================================================
-// NAVIGATION & UTILS
+// UTILITIES
 // ============================================================
 
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+function setLoading(text, sub) {
+    document.getElementById('loading-text').textContent = text;
+    document.getElementById('loading-sub').textContent = sub;
 }
 
-function setStep(stepId, state) {
-    const step = document.getElementById(stepId);
-    step.classList.remove('active', 'done');
-    step.classList.add(state);
-}
-
-function updateStatus(text) {
-    document.getElementById('processing-status').textContent = text;
-}
-
-function resetToUpload() {
-    // Reset state
-    APP.imageFile = null;
-    APP.imageBase64 = null;
-    APP.trialData = null;
-    APP.audioBlob = null;
-    if (APP.audioElement) {
-        APP.audioElement.pause();
-        APP.audioElement = null;
-    }
-    APP.isPlaying = false;
-
-    // Reset UI
-    document.getElementById('upload-zone').classList.remove('hidden');
-    document.getElementById('preview-area').classList.add('hidden');
-    document.getElementById('verdict-panel').classList.add('hidden');
-    document.getElementById('file-input').value = '';
-
-    // Reset progress steps
-    document.querySelectorAll('.progress-steps .step').forEach(s => {
-        s.classList.remove('active', 'done');
-    });
-
-    showScreen('screen-upload');
-}
-
-function shareVerdict() {
-    if (!APP.trialData) return;
-
-    const text = `🏛️ DOG COURT VERDICT\n\n${APP.trialData.case_title}\nCharge: ${APP.trialData.charge}\n\nVerdict: ${APP.trialData.verdict}\nReason: ${APP.trialData.verdict_reason}\n\n⚖️ Try it yourself: [URL]`;
-
-    if (navigator.share) {
-        navigator.share({ text });
-    } else {
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Verdict copied to clipboard!');
-        });
+function share() {
+    const text = `🐾 Just used PawWise — an AI vet friend that checks your dog's health from a photo!\n\nTry it: ${window.location.href}`;
+    if (navigator.share) navigator.share({ text });
+    else {
+        navigator.clipboard.writeText(text);
+        alert('Link copied!');
     }
 }
