@@ -536,19 +536,17 @@ async function callElevenLabsDialogue(inputs) {
 
 function displayResults(result, audioBlob) {
     // Urgency banner
-    const banner = document.getElementById('urgency-banner');
-    const urgencyIcons = { green: '🟢', yellow: '🟡', orange: '🟠', red: '🔴' };
-    banner.className = `urgency-banner ${result.urgency}`;
+    const banner = document.getElementById('urgency');
+    banner.className = `urgency ${result.urgency}`;
     banner.classList.remove('hidden');
-    document.getElementById('urgency-icon').textContent = urgencyIcons[result.urgency] || '🟢';
     document.getElementById('urgency-text').textContent = result.urgency_label || 'Assessment complete';
 
     // Voice player
     if (audioBlob) {
         setupAudio(audioBlob);
-        document.getElementById('voice-player').classList.remove('hidden');
+        document.getElementById('voice-card').classList.remove('hidden');
     } else {
-        document.getElementById('voice-player').classList.add('hidden');
+        document.getElementById('voice-card').classList.add('hidden');
     }
 
     // Build report HTML
@@ -556,7 +554,7 @@ function displayResults(result, audioBlob) {
     report.innerHTML = buildReportHTML(result);
 
     // Hide court section
-    document.getElementById('court-results').classList.add('hidden');
+    document.getElementById('court').classList.add('hidden');
     report.classList.remove('hidden');
 
     showSection('ws-results');
@@ -662,10 +660,10 @@ function buildReportHTML(result) {
 function displayCourtResults(script, audioBlob) {
     // Hide regular report, show court
     document.getElementById('report').classList.add('hidden');
-    document.getElementById('urgency-banner').classList.add('hidden');
-    document.getElementById('voice-player').classList.add('hidden');
+    document.getElementById('urgency').classList.add('hidden');
+    document.getElementById('voice-card').classList.add('hidden');
 
-    const courtSection = document.getElementById('court-results');
+    const courtSection = document.getElementById('court');
     courtSection.classList.remove('hidden');
 
     document.getElementById('court-case-title').textContent = script.case_title || 'The People vs. Dog';
