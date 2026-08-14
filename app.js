@@ -5,7 +5,7 @@
 // DEV MODE: Set to true to use local Bedrock proxy instead of Gemini
 const DEV_MODE = false;
 const PROXY_URL = 'http://localhost:5555';
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent';
 
 // Pre-baked demos (work without any API keys)
 const DEMO_DATA = {
