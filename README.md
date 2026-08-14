@@ -97,7 +97,7 @@ npx serve .
 | Google AI (Gemini) | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) | ✅ Yes |
 | ElevenLabs | [elevenlabs.io/app/settings/api-keys](https://elevenlabs.io/app/settings/api-keys) | Optional (for voice) |
 
-> Keys are stored in your browser's localStorage. Never sent to any server. Never logged.
+> 🔒 Keys are stored in your browser's localStorage. Never sent to any server. Never logged.
 
 ---
 
@@ -168,9 +168,27 @@ PawWise is an AI tool, not a veterinarian. It's designed to help you make better
 
 ---
 
+## 👨‍💻 Author
+
+<div align="center">
+
+**Sarvar Nadaf**
+
+Cloud Architect • 10+ years in Cloud & IT • 7x AWS Certified • AWS Community Builder
+
+[![Dev.to](https://img.shields.io/badge/Dev.to-15K+_followers-0A0A0A?style=flat-square&logo=devdotto)](https://dev.to/simplynadaf)
+[![YouTube](https://img.shields.io/badge/YouTube-@TechwithSarvar-red?style=flat-square&logo=youtube)](https://www.youtube.com/@TechwithSarvar)
+[![GitHub](https://img.shields.io/badge/GitHub-SimplyNadaf-181717?style=flat-square&logo=github)](https://github.com/simplynadaf)
+[![Portfolio](https://img.shields.io/badge/Portfolio-sarvarnadaf.com-blue?style=flat-square&logo=google-chrome)](https://sarvarnadaf.com)
+[![Email](https://img.shields.io/badge/Email-simplynadaf@gmail.com-D14836?style=flat-square&logo=gmail)](mailto:simplynadaf@gmail.com)
+
+</div>
+
+---
+
 ## 📄 License
 
-MIT — Built with ❤️ by [Sarvar Nadaf](https://dev.to/simplynadaf)
+MIT — Because good tools should be accessible to everyone.
 
 ---
 
@@ -179,6 +197,8 @@ MIT — Built with ❤️ by [Sarvar Nadaf](https://dev.to/simplynadaf)
 **Because no dog should suffer in silence while their owner thinks everything is fine.**
 
 <br/>
+
+⭐ If this helped you, give it a star!
 
 [![Star this repo](https://img.shields.io/github/stars/simplynadaf/dog-court?style=social)](https://github.com/simplynadaf/dog-court)
 
