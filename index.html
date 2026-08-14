@@ -3,192 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PawWise — Your AI Vet Friend</title>
-    <meta name="description" content="Upload a photo of your dog. Get instant health checks, behavior explanations, and emergency triage — powered by Google AI and ElevenLabs.">
+    <title>PawWise — AI That Actually Understands Your Dog</title>
+    <meta name="description" content="Upload a photo. Get instant health checks, behavior explanations, and emergency triage. Because 60% of dog health issues are caught too late.">
+    <meta property="og:title" content="PawWise — AI That Actually Understands Your Dog">
+    <meta property="og:description" content="Health checks, behavior decoding, emergency triage — powered by AI. Free.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <span class="logo-icon">🐾</span>
-                <span class="logo-text">PawWise</span>
-            </div>
-            <button class="btn-keys" id="btn-keys" title="API Keys">🔑</button>
-        </header>
+    <!-- Noise texture overlay -->
+    <div class="noise"></div>
 
-        <!-- Mode Selector -->
-        <nav class="modes" id="modes">
-            <button class="mode-btn active" data-mode="health">
-                <span class="mode-icon">🏥</span>
-                <span class="mode-label">Health Check</span>
-            </button>
-            <button class="mode-btn" data-mode="behavior">
-                <span class="mode-icon">🧠</span>
-                <span class="mode-label">Behavior</span>
-            </button>
-            <button class="mode-btn" data-mode="emergency">
-                <span class="mode-icon">🚨</span>
-                <span class="mode-label">Emergency</span>
-            </button>
-            <button class="mode-btn" data-mode="court">
-                <span class="mode-icon">🏛️</span>
-                <span class="mode-label">Dog Court</span>
-            </button>
+    <div class="app">
+        <!-- Floating Nav -->
+        <nav class="nav">
+            <div class="nav-inner">
+                <div class="nav-logo">
+                    <span class="nav-paw">🐾</span>
+                    <span class="nav-brand">PawWise</span>
+                </div>
+                <button class="nav-key-btn" id="btn-keys" aria-label="API Keys">
+                    <span>🔑</span>
+                    <span class="nav-key-label">Keys</span>
+                </button>
+            </div>
         </nav>
 
-        <!-- Main Content Area -->
-        <main class="main">
-            <!-- Upload Section -->
-            <section class="upload-section" id="upload-section">
-                <div class="mode-description" id="mode-description">
-                    <h2 id="mode-title">Health Check</h2>
-                    <p id="mode-subtitle">Upload a photo of your dog. AI will assess body condition, coat health, posture, and flag anything to watch for.</p>
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                <span>Built for DEV Weekend Challenge: Dog Days Edition</span>
+            </div>
+            <h1 class="hero-title">
+                Your dog can't tell you<br>
+                <span class="hero-accent">what's wrong.</span><br>
+                Now AI can.
+            </h1>
+            <p class="hero-sub">
+                60% of serious health issues in dogs are caught too late. PawWise analyzes a photo of your dog and gives you instant health insights, behavior explanations, and emergency guidance — spoken in a calm voice when you need it most.
+            </p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-num">59%</span>
+                    <span class="stat-label">of dogs are obese<br>(owners don't know)</span>
                 </div>
+                <div class="stat">
+                    <span class="stat-num">60%</span>
+                    <span class="stat-label">of health issues<br>caught too late</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">$653</span>
+                    <span class="stat-label">avg emergency vet<br>(often unnecessary)</span>
+                </div>
+            </div>
+            <a href="#modes-section" class="hero-cta">
+                <span>Try PawWise Free</span>
+                <span class="cta-arrow">↓</span>
+            </a>
+        </section>
 
+        <!-- Modes Section -->
+        <section class="modes-section" id="modes-section">
+            <div class="modes-grid">
+                <button class="mode-card active" data-mode="health">
+                    <div class="mode-card-icon">🏥</div>
+                    <h3>Health Check</h3>
+                    <p>Photo → body condition, coat, eyes, posture, breed risks</p>
+                </button>
+                <button class="mode-card" data-mode="behavior">
+                    <div class="mode-card-icon">🧠</div>
+                    <h3>Behavior Decoder</h3>
+                    <p>Why is my dog doing that? Breed-specific explanations</p>
+                </button>
+                <button class="mode-card" data-mode="emergency">
+                    <div class="mode-card-icon">🚨</div>
+                    <h3>Emergency Triage</h3>
+                    <p>Is this an emergency? Urgency scale + first aid steps</p>
+                </button>
+                <button class="mode-card" data-mode="court">
+                    <div class="mode-card-icon">🏛️</div>
+                    <h3>Dog Court</h3>
+                    <p>Your dog is healthy? Put them on trial for their crimes</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- Workspace -->
+        <section class="workspace" id="workspace">
+            <!-- Mode Header -->
+            <div class="ws-header" id="ws-header">
+                <h2 id="ws-title">Health Check</h2>
+                <p id="ws-subtitle">Upload a clear photo of your dog. AI will assess body condition, coat, posture, and flag breed-specific risks.</p>
+            </div>
+
+            <!-- Input Area -->
+            <div class="ws-input" id="ws-input">
+                <!-- Upload Zone -->
                 <div class="upload-zone" id="upload-zone">
-                    <div class="upload-content">
-                        <div class="upload-icon">📸</div>
-                        <p class="upload-text">Drop a photo of your dog</p>
-                        <p class="upload-hint">Clear, well-lit photo works best</p>
-                        <button class="btn-upload">Choose Photo</button>
+                    <div class="upload-inner">
+                        <div class="upload-icon-wrap">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </div>
+                        <p class="upload-title">Drop a photo of your dog</p>
+                        <p class="upload-sub">or click to browse — clear, well-lit photos work best</p>
                     </div>
                     <input type="file" id="file-input" accept="image/*" hidden>
                 </div>
 
-                <!-- Text input for behavior/emergency modes -->
-                <div class="text-input-section hidden" id="text-input-section">
-                    <textarea id="situation-input" placeholder="Describe what's happening..." rows="3"></textarea>
-                    <p class="input-hint" id="input-hint">E.g., "My dog has been limping for 2 days but still eating normally"</p>
+                <!-- Preview -->
+                <div class="preview hidden" id="preview">
+                    <img id="preview-img" alt="Your dog">
+                    <button class="preview-remove" id="btn-remove" aria-label="Remove photo">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
                 </div>
 
-                <!-- Dog Profile (optional) -->
-                <details class="dog-profile" id="dog-profile">
-                    <summary>🐕 Add dog's details (better results)</summary>
-                    <div class="profile-fields">
-                        <div class="field-row">
-                            <div class="field">
-                                <label>Breed</label>
-                                <input type="text" id="dog-breed" placeholder="e.g., Labrador">
-                            </div>
-                            <div class="field">
-                                <label>Age</label>
-                                <input type="text" id="dog-age" placeholder="e.g., 4 years">
-                            </div>
+                <!-- Text Input (behavior/emergency) -->
+                <div class="text-area hidden" id="text-area">
+                    <textarea id="situation-input" placeholder="Describe what's happening..."></textarea>
+                    <p class="text-hint" id="text-hint">E.g., "My dog has been limping for 2 days but still eating normally"</p>
+                </div>
+
+                <!-- Dog Profile -->
+                <details class="profile-panel" id="profile-panel">
+                    <summary>
+                        <span class="profile-icon">🐕</span>
+                        Add your dog's details for better results
+                    </summary>
+                    <div class="profile-grid">
+                        <div class="profile-field">
+                            <label>Breed</label>
+                            <input type="text" id="dog-breed" placeholder="e.g., Labrador">
                         </div>
-                        <div class="field-row">
-                            <div class="field">
-                                <label>Weight</label>
-                                <input type="text" id="dog-weight" placeholder="e.g., 30 kg">
-                            </div>
-                            <div class="field">
-                                <label>Name</label>
-                                <input type="text" id="dog-name" placeholder="e.g., Max">
-                            </div>
+                        <div class="profile-field">
+                            <label>Age</label>
+                            <input type="text" id="dog-age" placeholder="e.g., 4 years">
+                        </div>
+                        <div class="profile-field">
+                            <label>Weight</label>
+                            <input type="text" id="dog-weight" placeholder="e.g., 30 kg">
+                        </div>
+                        <div class="profile-field">
+                            <label>Name</label>
+                            <input type="text" id="dog-name" placeholder="e.g., Max">
                         </div>
                     </div>
                 </details>
 
-                <!-- Preview -->
-                <div class="preview hidden" id="preview">
-                    <img id="preview-img" alt="Your dog">
-                    <button class="btn-remove" id="btn-remove">✕</button>
-                </div>
-
+                <!-- Analyze Button -->
                 <button class="btn-analyze hidden" id="btn-analyze">
-                    <span class="btn-icon">✨</span>
-                    <span id="btn-analyze-text">Analyze</span>
+                    <span id="btn-analyze-text">Check Health</span>
+                    <span class="btn-shimmer"></span>
                 </button>
-            </section>
+            </div>
 
-            <!-- Results Section -->
-            <section class="results-section hidden" id="results-section">
-                <!-- Urgency Banner (for emergency/health) -->
-                <div class="urgency-banner hidden" id="urgency-banner">
-                    <span class="urgency-icon" id="urgency-icon">🟢</span>
+            <!-- Loading State -->
+            <div class="ws-loading hidden" id="ws-loading">
+                <div class="loading-ring">
+                    <div class="ring-segment"></div>
+                </div>
+                <p class="loading-title" id="loading-title">Analyzing your dog...</p>
+                <p class="loading-sub" id="loading-sub">This usually takes 5-10 seconds</p>
+            </div>
+
+            <!-- Results -->
+            <div class="ws-results hidden" id="ws-results">
+                <!-- Urgency Banner -->
+                <div class="urgency" id="urgency">
+                    <span class="urgency-dot" id="urgency-dot"></span>
                     <span class="urgency-text" id="urgency-text">Everything looks normal</span>
                 </div>
 
                 <!-- Voice Player -->
-                <div class="voice-player hidden" id="voice-player">
-                    <button class="btn-play" id="btn-play">▶</button>
-                    <div class="voice-bar">
+                <div class="voice-card hidden" id="voice-card">
+                    <button class="voice-play" id="btn-play">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    </button>
+                    <div class="voice-wave">
                         <div class="voice-progress" id="voice-progress"></div>
                     </div>
                     <span class="voice-label">AI Voice Summary</span>
                 </div>
 
-                <!-- Report Content -->
-                <div class="report" id="report">
-                    <!-- Dynamically populated -->
-                </div>
+                <!-- Report -->
+                <div class="report" id="report"></div>
 
-                <!-- Dog Court Results (special) -->
-                <div class="court-results hidden" id="court-results">
-                    <div class="court-header">
-                        <h3 id="court-case-title">The People vs. Max</h3>
-                        <p class="court-charge" id="court-charge">Charge: Grand Theft Sandwich</p>
-                    </div>
-                    <div class="court-audio">
-                        <button class="btn-play-court" id="btn-play-court">▶ Play Trial</button>
-                    </div>
+                <!-- Court Results -->
+                <div class="court hidden" id="court">
+                    <div class="court-badge">🏛️ DOG COURT</div>
+                    <h3 class="court-title" id="court-title">The People vs. Max</h3>
+                    <p class="court-charge" id="court-charge">Charge: Grand Theft Sandwich</p>
+                    <button class="court-play hidden" id="court-play">▶ Play Trial Audio</button>
                     <div class="court-transcript" id="court-transcript"></div>
                     <div class="court-verdict" id="court-verdict">
-                        <span class="verdict-text">NOT GUILTY</span>
-                        <span class="verdict-reason">by reason of extreme cuteness</span>
+                        <div class="verdict-stamp">NOT GUILTY</div>
+                        <div class="verdict-reason">by reason of extreme cuteness</div>
                     </div>
                 </div>
 
                 <!-- Actions -->
                 <div class="result-actions">
-                    <button class="btn-secondary" id="btn-new">← New Check</button>
-                    <button class="btn-secondary" id="btn-share">Share 🔗</button>
-                </div>
-            </section>
-
-            <!-- Loading -->
-            <section class="loading-section hidden" id="loading-section">
-                <div class="loader"></div>
-                <p class="loading-text" id="loading-text">Analyzing your dog...</p>
-                <p class="loading-sub" id="loading-sub">This usually takes 5-10 seconds</p>
-            </section>
-        </main>
-
-        <!-- API Keys Modal -->
-        <div class="modal hidden" id="keys-modal">
-            <div class="modal-content">
-                <h3>🔑 API Keys</h3>
-                <p class="modal-desc">Free keys — your data stays in your browser.</p>
-                <div class="field">
-                    <label>Google AI (Gemini)</label>
-                    <input type="password" id="gemini-key" placeholder="AIza...">
-                    <a href="https://aistudio.google.com/apikey" target="_blank">Get free key →</a>
-                </div>
-                <div class="field">
-                    <label>ElevenLabs (optional — for voice)</label>
-                    <input type="password" id="elevenlabs-key" placeholder="sk_...">
-                    <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank">Get free key →</a>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn-primary" id="btn-save-keys">Save</button>
-                    <button class="btn-secondary" id="btn-close-modal">Cancel</button>
+                    <button class="btn-ghost" id="btn-new">← New Check</button>
+                    <button class="btn-ghost" id="btn-share">Share Result</button>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Footer -->
-        <footer>
-            <p>Built for <a href="https://dev.to/challenges/weekend-2026-08-13">DEV Weekend Challenge: Dog Days Edition</a></p>
-            <p class="badges">
-                <span class="badge badge-google">Google AI</span>
-                <span class="badge badge-eleven">ElevenLabs</span>
-            </p>
-            <p class="disclaimer">⚠️ Not a substitute for veterinary care. When in doubt, see your vet.</p>
+        <footer class="footer">
+            <div class="footer-badges">
+                <span class="tech-badge google">Google AI</span>
+                <span class="tech-badge eleven">ElevenLabs</span>
+            </div>
+            <p class="footer-text">Built by <a href="https://dev.to/simplynadaf">Sarvar Nadaf</a> for <a href="https://dev.to/challenges/weekend-2026-08-13">DEV Weekend Challenge</a></p>
+            <p class="footer-disclaimer">⚠️ AI tool, not a vet. When in doubt, see your veterinarian.</p>
         </footer>
+    </div>
+
+    <!-- Keys Modal -->
+    <div class="modal hidden" id="keys-modal">
+        <div class="modal-backdrop" id="modal-backdrop"></div>
+        <div class="modal-card">
+            <h3>🔑 Connect Your Keys</h3>
+            <p class="modal-sub">Free API keys. Your data stays in your browser.</p>
+            <div class="modal-field">
+                <label>Google AI (Gemini) <span class="required">required</span></label>
+                <input type="password" id="gemini-key" placeholder="AIza...">
+                <a href="https://aistudio.google.com/apikey" target="_blank" class="field-link">Get free key →</a>
+            </div>
+            <div class="modal-field">
+                <label>ElevenLabs <span class="optional">optional, for voice</span></label>
+                <input type="password" id="elevenlabs-key" placeholder="sk_...">
+                <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" class="field-link">Get free key →</a>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" id="btn-save-keys">Save Keys</button>
+                <button class="btn-ghost" id="btn-close-modal">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
