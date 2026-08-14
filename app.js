@@ -1,5 +1,5 @@
 // ============================================================
-// PawWise — AI Vet Friend
+// PawWise - AI Vet Friend
 // ============================================================
 
 // Configuration
@@ -27,7 +27,7 @@ const MODES = {
     },
     behavior: {
         title: 'Behavior Decoder',
-        subtitle: 'Why is your dog doing that? Describe the behavior or upload a photo — get breed-specific explanations and advice.',
+        subtitle: 'Why is your dog doing that? Describe the behavior or upload a photo - get breed-specific explanations and advice.',
         btnText: 'Explain Behavior',
         showUpload: true,
         showText: true,
@@ -330,7 +330,7 @@ Provide emergency triage in this JSON format:
     "assessment": "2-3 sentence explanation of what's likely happening",
     "immediate_actions": ["what to do RIGHT NOW, step by step"],
     "watch_for": ["signs that indicate it's getting WORSE and they should go to emergency vet"],
-    "vet_questions": ["questions the vet will ask — prepare these answers"],
+    "vet_questions": ["questions the vet will ask - prepare these answers"],
     "timeframe": "how urgently they need to act (e.g., 'within 2 hours' or 'schedule within a week')",
     "voice_summary": "Calm, reassuring 2-3 sentence spoken summary. Be clear about urgency without causing panic."
 }
@@ -692,7 +692,7 @@ function setLoading(text, sub) {
 }
 
 function share() {
-    const text = `🐾 Just used PawWise — an AI vet friend that checks your dog's health from a photo!\n\nTry it: ${window.location.href}`;
+    const text = `🐾 Just used PawWise - an AI vet friend that checks your dog's health from a photo!\n\nTry it: ${window.location.href}`;
     if (navigator.share) navigator.share({ text });
     else {
         navigator.clipboard.writeText(text);

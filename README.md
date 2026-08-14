@@ -11,7 +11,7 @@
 
 <br/>
 
-<img src="img/banner.png" alt="PawWise — AI Vet Friend" width="100%"/>
+<img src="img/banner.png" alt="PawWise - AI Vet Friend" width="100%"/>
 
 <br/>
 
@@ -75,9 +75,9 @@ I built an AI that catches it in a photo.
 └────────────────────────────────────────────────┘
 ```
 
-- **Google AI (Gemini 3.5 Flash)** — Multimodal image analysis, structured JSON output, breed-aware health assessment
-- **ElevenLabs** — Voice summaries (TTS) + multi-character courtroom drama (Text-to-Dialogue API)
-- **Zero dependencies** — No React, no build tools, no node_modules. Pure vanilla. Instant load.
+- **Google AI (Gemini 3.5 Flash)** - Multimodal image analysis, structured JSON output, breed-aware health assessment
+- **ElevenLabs** - Voice summaries (TTS) + multi-character courtroom drama (Text-to-Dialogue API)
+- **Zero dependencies** - No React, no build tools, no node_modules. Pure vanilla. Instant load.
 
 ---
 
@@ -136,8 +136,8 @@ npx serve .
 **[DEV Weekend Challenge: Dog Days Edition](https://dev.to/challenges/weekend-2026-08-13)**
 
 Prize categories targeted:
-- ✅ **Best Use of Google AI** — Gemini multimodal vision + structured JSON health triage
-- ✅ **Best Use of ElevenLabs** — Voice summaries + multi-character courtroom drama
+- ✅ **Best Use of Google AI** - Gemini multimodal vision + structured JSON health triage
+- ✅ **Best Use of ElevenLabs** - Voice summaries + multi-character courtroom drama
 
 ---
 
@@ -164,7 +164,7 @@ dog-court/
 
 ## ⚠️ Disclaimer
 
-PawWise is an AI tool, not a veterinarian. It's designed to help you make better decisions about your dog's health — not replace professional veterinary care. When in doubt, always see your vet.
+PawWise is an AI tool, not a veterinarian. It's designed to help you make better decisions about your dog's health - not replace professional veterinary care. When in doubt, always see your vet.
 
 ---
 
@@ -188,7 +188,7 @@ Cloud Architect • 10+ years in Cloud & IT • 7x AWS Certified • AWS Communi
 
 ## 📄 License
 
-MIT — Because good tools should be accessible to everyone.
+MIT - Because good tools should be accessible to everyone.
 
 ---
 
