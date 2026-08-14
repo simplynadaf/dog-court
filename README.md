@@ -6,7 +6,7 @@
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=github)](https://simplynadaf.github.io/dog-court)
 [![YouTube](https://img.shields.io/badge/Watch-Demo-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=vqyF_65Qc_s)
-[![Dev.to](https://img.shields.io/badge/Read-Article-0A0A0A?style=for-the-badge&logo=devdotto)](https://dev.to/simplynadaf)
+[![Dev.to](https://img.shields.io/badge/Read-Article-0A0A0A?style=for-the-badge&logo=devdotto)](https://dev.to/sarvar_04/59-of-dogs-are-obese-and-their-owners-dont-know-so-i-built-an-ai-that-tells-them-2a89)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 <br/>
@@ -21,7 +21,7 @@ I built an AI that catches it in a photo.
 
 <br/>
 
-[Live Site →](https://simplynadaf.github.io/dog-court) &nbsp;•&nbsp; [Watch Demo →](https://www.youtube.com/watch?v=vqyF_65Qc_s) &nbsp;•&nbsp; [Read Article →](https://dev.to/simplynadaf)
+[Live Site →](https://simplynadaf.github.io/dog-court) &nbsp;•&nbsp; [Watch Demo →](https://www.youtube.com/watch?v=vqyF_65Qc_s) &nbsp;•&nbsp; [Read Article →](https://dev.to/sarvar_04/59-of-dogs-are-obese-and-their-owners-dont-know-so-i-built-an-ai-that-tells-them-2a89)
 
 </div>
 
