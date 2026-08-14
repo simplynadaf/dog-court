@@ -29,6 +29,8 @@ The serious modes solve real problems. The fun mode gives you something to share
 
 ## Demo
 
+{% youtube vqyF_65Qc_s %}
+
 {% embed https://simplynadaf.github.io/dog-court %}
 
 **Try it live:** [simplynadaf.github.io/dog-court](https://simplynadaf.github.io/dog-court)

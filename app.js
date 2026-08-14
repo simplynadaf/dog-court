@@ -5,14 +5,6 @@
 // Configuration
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent';
 
-// Pre-baked demos (work without any API keys)
-const DEMO_DATA = {
-    health: { json: 'demo/health.json', audio: 'demo/health.mp3' },
-    behavior: { json: 'demo/behavior.json', audio: 'demo/behavior.mp3' },
-    emergency: { json: 'demo/emergency.json', audio: 'demo/emergency.mp3' },
-    court: { json: 'demo/court.json', audio: 'demo/court.mp3' },
-};
-
 const STATE = {
     mode: 'health', // health | behavior | emergency | court
     geminiKey: null,
@@ -221,11 +213,14 @@ function showSection(id) {
 async function analyze() {
     STATE.geminiKey = document.getElementById('gemini-key').value.trim() || STATE.geminiKey;
     
-    // If no API key, use pre-baked demo
-    const useDemo = !STATE.geminiKey;
+    if (!STATE.geminiKey) {
+        toggleModal(true);
+        return;
+    }
+
     const hasInput = STATE.imageBase64 || document.getElementById('situation-input').value.trim();
 
-    if (!hasInput && !useDemo) {
+    if (!hasInput) {
         alert('Please upload a photo or describe the situation.');
         return;
     }
@@ -234,12 +229,6 @@ async function analyze() {
     setLoading('Analyzing your dog...', 'This usually takes 5-10 seconds');
 
     try {
-        // Try demo mode first (pre-baked results for instant experience)
-        if (!STATE.geminiKey || useDemo) {
-            await runDemoMode();
-            return;
-        }
-
         if (STATE.mode === 'court') {
             await runCourtMode();
         } else {
@@ -247,58 +236,7 @@ async function analyze() {
         }
     } catch (err) {
         console.error(err);
-        // Fallback to demo on error
-        console.log('Falling back to demo mode...');
-        await runDemoMode();
-    }
-}
-
-async function runDemoMode() {
-    // Realistic AI processing simulation (20-25 seconds)
-    const loadingSteps = [
-        ['Uploading image to AI...', 'Preparing for analysis'],
-        ['AI is examining the photo...', 'Looking at body condition, posture, coat...'],
-        ['Analyzing breed-specific indicators...', 'Cross-referencing with health database'],
-        ['Generating detailed report...', 'Almost done'],
-    ];
-
-    if (STATE.mode === 'court') {
-        loadingSteps[0] = ['Examining the crime scene...', 'Collecting evidence'];
-        loadingSteps[1] = ['AI is building the case...', 'Interviewing witnesses'];
-        loadingSteps[2] = ['Assembling the courtroom...', 'Briefing the defense attorney'];
-        loadingSteps[3] = ['Generating trial transcript...', 'The judge is ready'];
-    } else if (STATE.mode === 'emergency') {
-        loadingSteps[0] = ['Assessing the situation...', 'Reviewing symptoms'];
-        loadingSteps[1] = ['AI is evaluating urgency...', 'Checking against known conditions'];
-        loadingSteps[2] = ['Determining triage level...', 'Preparing recommendations'];
-        loadingSteps[3] = ['Generating guidance...', 'Almost done'];
-    }
-
-    for (let i = 0; i < loadingSteps.length; i++) {
-        setLoading(loadingSteps[i][0], loadingSteps[i][1]);
-        await new Promise(r => setTimeout(r, 5000 + Math.random() * 2000));
-    }
-
-    const mode = STATE.mode;
-    const demoFiles = DEMO_DATA[mode] || DEMO_DATA.health;
-
-    try {
-        const resp = await fetch(demoFiles.json);
-        const result = await resp.json();
-
-        let audioBlob = null;
-        try {
-            const audioResp = await fetch(demoFiles.audio);
-            audioBlob = await audioResp.blob();
-        } catch(e) { /* audio optional */ }
-
-        if (mode === 'court') {
-            displayCourtResults(result, audioBlob);
-        } else {
-            displayResults(result, audioBlob);
-        }
-    } catch(e) {
-        alert('Something went wrong. Please check your API keys and try again.');
+        alert('Something went wrong: ' + err.message + '\n\nPlease check your API key and try again.');
         showSection('ws-input');
     }
 }
