@@ -595,28 +595,6 @@ body {
     transition: all 0.3s var(--ease-spring);
 }
 
-.btn-demo {
-    width: 100%;
-    margin-top: 0.75rem;
-    padding: 0.8rem;
-    background: var(--accent-soft);
-    color: var(--accent);
-    border: 1px solid rgba(45, 91, 235, 0.2);
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
-    font-weight: 600;
-    font-family: var(--font);
-    cursor: pointer;
-    transition: all 0.3s var(--ease-spring);
-}
-
-.btn-demo:hover {
-    background: var(--accent);
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(45, 91, 235, 0.3);
-}
-
 .btn-analyze:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
